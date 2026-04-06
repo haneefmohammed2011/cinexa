@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "hem-platform"
+  },
+  "targets": {
+    "hem-platform": {
+      "hosting": {
+        "cinexa": [
+          "cinexa"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
