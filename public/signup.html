@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Join CINEXA+</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1500.0.min.js"></script>
+    <style>
+        body { background: #050505; color: white; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body>
+    <div class="glass max-w-md w-full p-12 rounded-[40px] text-center">
+        <h1 class="text-2xl font-black italic mb-8 uppercase">Create Profile</h1>
+        <input type="text" id="user" placeholder="Username" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl mb-4 outline-none focus:border-purple-500">
+        <input type="password" id="pass" placeholder="Password" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl mb-4 outline-none focus:border-purple-500">
+        
+        <select id="plan" class="w-full bg-[#111] border border-white/10 p-4 rounded-2xl mb-8 outline-none text-white/50 text-xs font-bold uppercase">
+            <option value="Free">Standard (Free)</option>
+            <option value="Plus" selected>Cinexa Plus ($9.99)</option>
+        </select>
+
+        <button onclick="handleSignup()" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold uppercase text-xs tracking-widest hover:bg-purple-500 transition">Create Account</button>
+        <p class="mt-8 text-[10px] text-white/30 uppercase tracking-widest">Already a member? <a href="login.html" class="text-white underline">Sign In</a></p>
+    </div>
+
+    <script>
+        // CONFIGURATION MATCHING YOUR LONDON DYNAMODB
+        AWS.config.update({ 
+            region: 'eu-west-2', 
+            accessKeyId: 'AKIAYS2NVVDJNFZHV4F4', 
+            secretAccessKey: '/YKvLs+mt7Srm/9qwnBej8ugpsJt2n3WP176opEh' 
+        });
+
+        const docClient = new AWS.DynamoDB.DocumentClient();
+        const TABLE_NAME = "CinexaUsers";
+
+        function handleSignup() {
+            const userVal = document.getElementById('user').value;
+            const passVal = document.getElementById('pass').value;
+            const planVal = document.getElementById('plan').value;
+
+            if(!userVal || !passVal) {
+                alert("Please enter a username and password.");
+                return;
+            }
+
+            const params = {
+                TableName: TABLE_NAME,
+                Item: { 
+                    userId: userVal, 
+                    password: passVal, 
+                    plan: planVal, 
+                    joined: new Date().toISOString() 
+                }
+            };
+
+            docClient.put(params, (err, data) => {
+                if (err) {
+                    console.error("AWS Signup Error:", err);
+                    alert("Signup Failed: " + err.message);
+                } else {
+                    // Success! Save the session so browse.html knows who you are
+                    localStorage.setItem('cinexa_session', JSON.stringify(params.Item));
+                    window.location.href = 'browse.html';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

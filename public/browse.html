@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINEXA+ | Discovery Entertainment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        :root { --accent: #a855f7; --bg: #050505; }
+        body { background-color: var(--bg); color: white; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .hero-gradient { background: linear-gradient(0deg, #050505 0%, rgba(5,5,5,0.4) 80%, transparent 100%); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        @keyframes popUp { from { opacity: 0; transform: scale(0.9) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .animate-pop { animation: popUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .hero-transition { transition: opacity 1.2s ease-in-out, transform 1.2s ease-in-out; }
+    </style>
+</head>
+<body onload="initSystem()">
+
+    <div id="profile-gate" class="fixed inset-0 z-[2000] bg-[#050505] flex items-center justify-center transition-all duration-700">
+        <div class="text-center w-full max-w-5xl px-6 animate-pop">
+            <h1 class="text-2xl font-black tracking-[18px] uppercase text-white/10 mb-20">CINEXA<span class="text-purple-500">+</span></h1>
+            <h2 class="text-5xl font-800 italic tracking-tighter mb-16 uppercase">Who is Exploring?</h2>
+            <div id="profile-list" class="flex flex-wrap justify-center gap-10 mb-20"></div>
+            <button onclick="showCreateProfile()" class="glass px-10 py-5 rounded-2xl text-[10px] font-bold uppercase tracking-[4px] hover:bg-white/10 transition">
+                <i class="fa-solid fa-plus mr-3"></i> Add Profile
+            </button>
+        </div>
+    </div>
+
+  
+    <div id="video-overlay" class="fixed inset-0 z-[1500] hidden bg-black flex items-center justify-center p-4">
+        <button onclick="stopTrailer()" class="absolute top-10 right-10 z-[1510] w-14 h-14 glass rounded-full flex items-center justify-center hover:bg-red-500 transition">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+        </button>
+        <div id="video-container" class="w-full h-full max-w-6xl aspect-video rounded-[40px] overflow-hidden shadow-2xl border border-white/10"></div>
+    </div>
+
+    
+    <div id="movie-modal" class="fixed inset-0 z-[1100] hidden flex items-center justify-center bg-black/95 backdrop-blur-3xl p-4 md:p-10">
+        <div class="glass max-w-7xl w-full rounded-[50px] overflow-hidden relative animate-pop border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
+            <button onclick="closeModal()" class="absolute top-8 right-8 z-[1110] w-12 h-12 glass rounded-full flex items-center justify-center hover:bg-red-500 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div id="modal-content" class="flex flex-col lg:flex-row"></div>
+        </div>
+    </div>
+
+   
+    <div id="main-app" class="opacity-0 transition-opacity duration-1000">
+        <nav class="fixed top-0 w-full z-[500] glass px-10 py-6 flex items-center justify-between">
+            <div class="flex items-center gap-12">
+                <h1 class="text-2xl font-800 italic tracking-tighter" onclick="location.reload()">CINEXA<span class="text-purple-500">+</span></h1>
+                <div class="hidden lg:flex gap-10 text-[10px] font-bold uppercase tracking-[4px] text-white/30">
+                    <a href="#" class="text-white">Home</a>
+                    <a href="#" class="hover:text-white" onclick="loadCategory('movie')">Movies</a>
+                    <a href="#" class="hover:text-white" onclick="loadCategory('tv')">TV Shows</a>
+                    <a href="#" class="hover:text-white" onclick="loadLibrary()">Trending</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-8">
+                <div class="relative hidden md:block">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/20 text-[10px]"></i>
+                    <input type="text" id="search-input" onkeyup="if(event.key==='Enter') handleSearch()" placeholder="Search Library..." class="bg-white/5 border border-white/10 rounded-full py-2.5 pl-12 pr-6 outline-none focus:border-purple-500 w-64 text-[11px] font-bold">
+                </div>
+                <div onclick="logout()" class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-[12px] font-black cursor-pointer shadow-xl" id="nav-initial">?</div>
+            </div>
+        </nav>
+
+        <header class="relative h-[95vh] w-full flex items-end overflow-hidden">
+            <div id="hero-bg-container" class="absolute inset-0">
+                <img id="hero-img" src="" class="absolute inset-0 w-full h-full object-cover hero-transition scale-105">
+            </div>
+            <div class="absolute inset-0 hero-gradient"></div>
+            
+            <div class="relative z-10 px-12 md:px-24 pb-32 max-w-5xl">
+                <div class="flex items-center gap-4 mb-8">
+                    <span class="bg-purple-600 text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">Global Discovery</span>
+                    <span id="hero-meta" class="text-white/50 text-[10px] font-bold uppercase tracking-[3px]"></span>
+                </div>
+                <h2 id="hero-title" class="text-6xl md:text-[8rem] font-800 italic uppercase tracking-tighter leading-[0.75] mb-12 drop-shadow-2xl">...</h2>
+                
+                <div class="flex flex-wrap gap-6 mb-16">
+                    <button id="hero-watch-trailer" class="bg-white text-black px-12 py-5 rounded-[24px] font-black text-[10px] uppercase tracking-[4px] hover:bg-purple-500 hover:text-white transition flex items-center gap-3">
+                        <i class="fa-solid fa-play text-[8px]"></i> WATCH TRAILER
+                    </button>
+                    <button id="hero-save-watchlist" class="glass px-12 py-5 rounded-[24px] font-black text-[10px] uppercase tracking-[4px] hover:bg-white/10 transition flex items-center gap-3">
+                        <i class="fa-solid fa-plus text-[8px]"></i> SAVE TO WATCHLIST
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <span class="text-[9px] font-bold uppercase tracking-[4px] text-white/30">Where to watch</span>
+                    <div class="flex gap-4">
+                        <div class="bg-red-600 px-5 py-2 rounded-xl text-[10px] font-black italic shadow-lg shadow-red-600/20">NETFLIX</div>
+                        <div class="bg-blue-500 px-5 py-2 rounded-xl text-[10px] font-black italic shadow-lg shadow-blue-500/20">PRIME</div>
+                        <div class="bg-emerald-500 px-5 py-2 rounded-xl text-[10px] font-black italic shadow-lg shadow-emerald-500/20">SHOWMAX</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="px-12 md:px-24 py-32">
+            <h3 id="grid-header" class="text-3xl font-800 italic uppercase tracking-widest mb-16 border-l-4 border-purple-500 pl-8">Popular Today</h3>
+            <div id="movie-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12"></div>
+        </main>
+
+        
+<footer class="mt-20 border-t border-white/5 bg-[#050505] pt-32 pb-16 px-12">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-20">
+        
+        
+        <div class="max-w-md">
+            <h1 class="text-3xl font-800 italic mb-8 uppercase tracking-tighter">
+                CINEXA+<span class="text-purple-500">PLUS</span>
+            </h1>
+            <p class="text-white/20 text-[11px] leading-relaxed mb-10 uppercase tracking-[4px]">
+                A premium digital discovery infrastructure owned and operated by 
+                <a href="https://hemafrica.com" target="_blank" class="text-white hover:text-purple-500 transition border-b border-white/10">HemAfrica Group</a>.
+                Delivering high-fidelity metadata across the African continent and beyond.
+            </p>
+            
+            
+            <div class="flex gap-8 items-center">
+                <a href="https://www.instagram.com/cinexaplus/?hl=en" target="_blank" class="group flex items-center gap-3">
+                    <i class="fa-brands fa-instagram text-2xl text-white/20 group-hover:text-purple-500 transition"></i>
+                    <span class="text-[9px] font-black uppercase tracking-[3px] text-white/10 group-hover:text-white transition">Follow Cinexa+</span>
+                </a>
+            </div>
+        </div>
+
+      
+        <div class="grid grid-cols-2 gap-24 text-[10px] font-bold uppercase tracking-[4px]">
+            <div class="flex flex-col gap-6">
+                <p class="text-purple-500 mb-2">Platform</p>
+                <a href="#" onclick="location.reload()" class="text-white/30 hover:text-white transition">Discovery Home</a>
+                <a href="https://hemafrica.com" target="_blank" class="text-white/30 hover:text-white transition">HemAfrica Corporate</a>
+            </div>
+            <div class="flex flex-col gap-6">
+                <p class="text-purple-500 mb-2">Governance</p>
+                <a href="privacy.html" class="text-white/30 hover:text-white transition">Privacy Protocol</a>
+                <a href="terms.html" class="text-white/30 hover:text-white transition">Terms of Use</a>
+                <a href="cookies.html" class="text-white/30 hover:text-white transition">Cookie Policy</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto mt-32 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="text-[9px] text-white/5 uppercase tracking-[10px]">
+            © 2026 HemAfrica Group Holdings. All Rights Reserved.
+        </div>
+        <div class="flex gap-10">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Nigeria.svg/1200px-Flag_of_Nigeria.svg.png" class="h-3 w-auto opacity-20 grayscale hover:grayscale-0 transition" alt="Nigeria">
+            <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" class="h-3 w-auto opacity-20 grayscale hover:grayscale-0 transition" alt="USA">
+            <img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" class="h-3 w-auto opacity-20 grayscale hover:grayscale-0 transition" alt="UK">
+        </div>
+    </div>
+</footer>
+
+
+    <div id="create-modal" class="fixed inset-0 z-[2100] hidden bg-black/95 backdrop-blur-3xl flex items-center justify-center p-6">
+        <div class="glass max-w-md w-full p-10 rounded-[40px] text-center border-purple-500/20">
+            <h3 class="text-2xl font-800 italic uppercase mb-8">New Identity</h3>
+            <input type="text" id="new-profile-name" placeholder="Name" class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 mb-8 outline-none focus:border-purple-500 text-center font-bold tracking-widest uppercase">
+            <button onclick="saveNewProfile()" class="w-full bg-purple-600 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-widest">Authorize</button>
+        </div>
+    </div>
+
+    <script>
+        const TMDB_KEY = '4166e48ae0ebb3f6693923dfe397c0b9';
+        let profiles = JSON.parse(localStorage.getItem('cinexa_profiles')) || [{name: 'Haneef', color: 'bg-purple-600'}];
+        let trendingData = [];
+        let heroIndex = 0;
+
+        function initSystem() { renderProfiles(); }
+
+        function renderProfiles() {
+            const list = document.getElementById('profile-list');
+            list.innerHTML = profiles.map((p, idx) => `
+                <div class="cursor-pointer group text-center" onclick="selectProfile(${idx})">
+                    <div class="w-32 h-32 md:w-44 md:h-44 rounded-[45px] ${p.color} mx-auto mb-6 flex items-center justify-center text-5xl font-black group-hover:scale-110 transition duration-500 shadow-2xl">
+                        ${p.name.charAt(0).toUpperCase()}
+                    </div>
+                    <p class="text-[12px] font-black uppercase tracking-[5px] text-white/30 group-hover:text-white">${p.name}</p>
+                </div>
+            `).join('');
+        }
+
+        function selectProfile(idx) {
+            document.getElementById('profile-gate').style.display = 'none';
+            document.getElementById('main-app').classList.remove('opacity-0');
+            document.getElementById('nav-initial').innerText = profiles[idx].name.charAt(0).toUpperCase();
+            document.getElementById('nav-initial').className = `w-10 h-10 rounded-xl ${profiles[idx].color} flex items-center justify-center text-[12px] font-black cursor-pointer shadow-xl`;
+            loadLibrary();
+        }
+
+        async function loadLibrary() {
+            const res = await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_KEY}`);
+            const data = await res.json();
+            trendingData = data.results;
+            startHeroRotation();
+            renderGrid(trendingData);
+        }
+
+        function startHeroRotation() {
+            updateHero(trendingData[heroIndex]);
+            setInterval(() => {
+                heroIndex = (heroIndex + 1) % 5; // Rotate top 5
+                updateHero(trendingData[heroIndex]);
+            }, 8000);
+        }
+
+        function updateHero(m) {
+            const img = document.getElementById('hero-img');
+            img.style.opacity = '0';
+            setTimeout(() => {
+                img.src = `https://image.tmdb.org/t/p/original${m.backdrop_path}`;
+                document.getElementById('hero-title').innerText = m.title || m.name;
+                document.getElementById('hero-meta').innerText = `${m.release_date || m.first_air_date} • ⭐ ${m.vote_average.toFixed(1)}`;
+                document.getElementById('hero-watch-trailer').onclick = () => playTrailer(m.id, m.media_type || 'movie');
+                document.getElementById('hero-save-watchlist').onclick = () => alert("Saved to Network Discovery List");
+                img.style.opacity = '1';
+            }, 1000);
+        }
+
+        function renderGrid(movies) {
+            document.getElementById('movie-grid').innerHTML = movies.map(m => `
+                <div class="group cursor-pointer animate-pop" onclick="openModal(${m.id}, '${m.media_type || 'movie'}')">
+                    <div class="aspect-[2/3] rounded-[40px] overflow-hidden mb-6 border border-white/5 group-hover:border-purple-500 shadow-2xl relative transition-all duration-500">
+                        <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <span class="text-[9px] font-black uppercase tracking-widest bg-white text-black px-5 py-2 rounded-full">Expand Metadata</span>
+                        </div>
+                    </div>
+                    <h4 class="text-[10px] font-800 uppercase tracking-widest truncate mb-1">${m.title || m.name}</h4>
+                    <p class="text-[9px] text-white/20 font-bold uppercase tracking-[2px]">${(m.release_date || m.first_air_date || '').split('-')[0]}</p>
+                </div>
+            `).join('');
+        }
+
+        async function openModal(id, type = 'movie') {
+            const modal = document.getElementById('movie-modal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            const [details, credits, providers] = await Promise.all([
+                fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${TMDB_KEY}`).then(r => r.json()),
+                fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${TMDB_KEY}`).then(r => r.json()),
+                fetch(`https://api.themoviedb.org/3/${type}/${id}/watch/providers?api_key=${TMDB_KEY}`).then(r => r.json())
+            ]);
+
+            const streams = providers.results?.US?.flatrate || [];
+            const cast = credits.cast.slice(0, 5);
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="w-full lg:w-2/5 min-h-[500px]"><img src="https://image.tmdb.org/t/p/w500${details.poster_path}" class="w-full h-full object-cover"></div>
+                <div class="w-full lg:w-3/5 p-12 md:p-16 flex flex-col justify-center">
+                    <h2 class="text-4xl md:text-6xl font-800 italic uppercase mb-6 tracking-tighter leading-none">${details.title || details.name}</h2>
+                    <div class="flex gap-4 mb-8 text-[10px] font-black uppercase text-purple-500 tracking-[3px]">
+                        <span>⭐ ${details.vote_average.toFixed(1)} Rating</span>
+                        <span>${details.runtime || details.episode_run_time?.[0] || '60'} Mins</span>
+                    </div>
+                    <p class="text-white/40 text-sm mb-10 leading-relaxed">${details.overview}</p>
+                    <div class="mb-10">
+                         <p class="text-[9px] font-bold text-white/20 uppercase tracking-[4px] mb-4">Lead Personnel</p>
+                         <div class="flex flex-wrap gap-3">${cast.map(a => `<span class="glass px-4 py-2 rounded-xl text-[9px] font-bold uppercase">${a.name}</span>`).join('')}</div>
+                    </div>
+                    <div class="flex gap-6">
+                        <button onclick="playTrailer(${details.id}, '${type}')" class="bg-white text-black px-12 py-5 rounded-[24px] font-black uppercase text-[10px] tracking-[4px]">Play Metadata</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function playTrailer(id, type) {
+            const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${TMDB_KEY}`);
+            const data = await res.json();
+            const trailer = data.results.find(v => v.type === 'Trailer')?.key;
+            if(!trailer) { alert("Digital asset missing."); return; }
+            document.getElementById('video-container').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${trailer}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            document.getElementById('video-overlay').classList.remove('hidden');
+        }
+
+        async function handleSearch() {
+            const q = document.getElementById('search-input').value;
+            if(!q) return;
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?query=${q}&api_key=${TMDB_KEY}`);
+            const data = await res.json();
+            document.getElementById('grid-header').innerText = `Results: ${q}`;
+            renderGrid(data.results);
+            window.scrollTo({top: 800, behavior: 'smooth'});
+        }
+
+        function stopTrailer() { document.getElementById('video-overlay').classList.add('hidden'); document.getElementById('video-container').innerHTML = ''; }
+        function closeModal() { document.getElementById('movie-modal').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+        function showCreateProfile() { document.getElementById('create-modal').classList.remove('hidden'); }
+        function saveNewProfile() {
+            const name = document.getElementById('new-profile-name').value;
+            if(!name) return;
+            profiles.push({name: name, color: 'bg-blue-600'});
+            localStorage.setItem('cinexa_profiles', JSON.stringify(profiles));
+            renderProfiles();
+            document.getElementById('create-modal').classList.add('hidden');
+        }
+        function logout() { location.reload(); }
+    </script>
+</body>
+</html>

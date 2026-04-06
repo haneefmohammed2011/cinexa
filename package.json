@@ -1,0 +1,9 @@
+{
+  "name": "cinexa",
+  "version": "1.0.0",
+  "description": "Cinexa Streaming Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve public"
+  }
+}
