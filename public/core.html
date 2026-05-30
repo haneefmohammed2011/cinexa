@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>H.E.M. Core | Technical Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --accent: #003399; --deep: #050b14; }
+        body { background: var(--deep); color: #fff; font-family: 'Inter', sans-serif; padding: 60px; line-height: 1.6; }
+        .code-wrap { background: rgba(255,255,255,0.05); padding: 40px; border: 1px solid rgba(255,255,255,0.1); font-family: monospace; color: #00ff88; margin: 40px 0; }
+        .tech-pill { display: inline-block; padding: 5px 15px; border: 1px solid rgba(255,255,255,0.3); font-size: 0.7rem; margin-right: 10px; margin-bottom: 10px; }
+        .label { color: var(--accent); font-weight: 800; font-size: 0.7rem; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <span class="label">Infrastructure Layer</span>
+    <h1 style="font-size: 3rem; margin: 20px 0;">HEM Core v1.0</h1>
+    <p style="max-width: 600px; color: rgba(255,255,255,0.6);">The H.E.M. Core is our proprietary Single Sign-On (SSO) and data distribution layer, ensuring every app in the movement speaks the same language.</p>
+    
+    <div class="code-wrap">
+        // SYSTEM INITIALIZATION <br>
+        const HEM_SSO = { <br>
+        &nbsp;&nbsp;auth: "OAuth2_Custom_Layer", <br>
+        &nbsp;&nbsp;encryption: "AES-256-GCM", <br>
+        &nbsp;&nbsp;nodes: ["Lagos", "New_York", "London"], <br>
+        &nbsp;&nbsp;subsidiaries: ["Pinglo", "Cinexa", "Ontrixa"] <br>
+        };
+    </div>
+
+    <div>
+        <span class="tech-pill">NEXT.JS</span>
+        <span class="tech-pill">AWS LAMBDA</span>
+        <span class="tech-pill">POSTGRESQL</span>
+        <span class="tech-pill">DYNAMO DB</span>
+    </div>
+</body>
+</html>

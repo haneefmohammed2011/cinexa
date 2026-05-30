@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINEXA+ | Secure Access</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { background-color: #050505; color: white; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .step-hidden { display: none; }
+        input[type="checkbox"] { accent-color: #a855f7; }
+        .btn-primary { background: white; color: black; font-weight: 900; letter-spacing: 1px; transition: all 0.3s ease; }
+        .btn-primary:hover { background: #a855f7; color: white; transform: scale(1.02); }
+        .otp-input { letter-spacing: 1.5rem; text-indent: 1.5rem; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
+
+    <div class="mb-12 text-center">
+        <h1 class="text-4xl font-800 italic tracking-tighter uppercase">CINEXA<span class="text-purple-500">+</span></h1>
+        <p id="step-indicator" class="text-[9px] font-black uppercase tracking-[5px] text-white/30 mt-3">Node Access: Identity</p>
+    </div>
+
+    <div class="glass w-full max-w-lg p-12 rounded-[50px] shadow-2xl relative">
+        
+        <!-- STEP 1: Identity & Security -->
+        <div id="step-1" class="step-content">
+            <h2 class="text-2xl font-800 italic mb-6">Create Identity</h2>
+            <form id="signup-form" class="space-y-4">
+                <input type="text" id="reg-name" placeholder="Full Name" required class="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl text-sm font-bold outline-none focus:border-purple-500 transition-all">
+                <input type="text" id="reg-contact" placeholder="Email or Phone Number" required class="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl text-sm font-bold outline-none focus:border-purple-500 transition-all">
+                
+                <div class="relative">
+                    <input type="password" id="reg-password" placeholder="Secure Password (Min 6 chars)" required minlength="6" class="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl text-sm font-bold outline-none focus:border-purple-500 transition-all">
+                    <p class="text-[9px] text-white/20 absolute right-4 top-5 font-bold uppercase">Security Tier 1</p>
+                </div>
+                
+                <div class="flex items-start gap-4 py-4">
+                    <input type="checkbox" id="terms" required class="w-5 h-5 mt-1 cursor-pointer">
+                    <label for="terms" class="text-[11px] text-white/40 leading-relaxed cursor-pointer hover:text-white transition-colors">
+                        I agree to the <span class="text-white underline font-bold">Terms of Service</span>.
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full btn-primary py-5 rounded-2xl text-xs uppercase">
+                    Begin Verification
+                </button>
+                <div id="signup-error" class="text-sm text-red-400 mt-2 hidden"></div>
+            </form>
+        </div>
+
+        <!-- STEP 1.5: Verification Node -->
+        <div id="step-v" class="step-content step-hidden text-center">
+            <h2 class="text-2xl font-800 italic mb-2">Verify Node</h2>
+            <p id="v-message" class="text-xs text-white/40 mb-10 px-4">An authorization code has been sent to your device.</p>
+            
+            <input type="text" maxlength="6" id="otp-code" placeholder="000000" class="otp-input w-full bg-white/5 border border-white/10 px-6 py-5 rounded-2xl text-2xl font-black text-center outline-none focus:border-purple-500 transition-all mb-8 uppercase">
+            
+            <button onclick="confirmVerification()" class="w-full btn-primary py-5 rounded-2xl text-xs uppercase shadow-2xl">
+                Verify Identity
+            </button>
+            <p class="mt-6 text-[10px] text-white/20 font-bold uppercase tracking-widest cursor-pointer hover:text-white transition-all">Resend Code</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { awsmConfig } from './aws-exports.js';
+
+        const LOCAL_USER_KEY = 'cinexaUsers';
+        let Auth = null;
+        let amplifyLoaded = false;
+        const hasAwsPlaceholder = awsmConfig.userPoolId.includes('REPLACE') || awsmConfig.userPoolWebClientId.includes('REPLACE');
+        const errBox = document.getElementById('signup-error');
+        let session = { name: '', contact: '', pass: '' };
+
+        async function initAuth() {
+            if (hasAwsPlaceholder) {
+                return;
+            }
+
+            try {
+                const mod = await import('https://cdn.jsdelivr.net/npm/aws-amplify@5.1.3/dist/aws-amplify.esm.js');
+                const Amplify = mod.default || mod.Amplify || mod;
+                Auth = mod.Auth;
+                Amplify.configure({
+                    Auth: {
+                        region: awsmConfig.region,
+                        userPoolId: awsmConfig.userPoolId,
+                        userPoolWebClientId: awsmConfig.userPoolWebClientId,
+                        authenticationFlowType: 'USER_PASSWORD_AUTH'
+                    }
+                });
+                amplifyLoaded = true;
+            } catch (err) {
+                console.warn('AWS Amplify unavailable, falling back to local signup.', err);
+            }
+        }
+
+        function getLocalUsers() {
+            return JSON.parse(localStorage.getItem(LOCAL_USER_KEY) || '[]');
+        }
+
+        function saveLocalUser(user) {
+            const users = getLocalUsers();
+            if (users.some(existing => existing.contact === user.contact)) {
+                const error = new Error('UsernameExists');
+                error.code = 'UsernameExistsException';
+                throw error;
+            }
+            users.push(user);
+            localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(users));
+        }
+
+        function signInLocal(contact, password) {
+            const users = getLocalUsers();
+            const user = users.find(item => item.contact === contact);
+            if (!user) {
+                throw new Error('User not found. Please sign up first.');
+            }
+            if (user.pass !== password) {
+                throw new Error('Incorrect password.');
+            }
+            return user;
+        }
+
+        function createSession(user) {
+            return {
+                name: user.name || user.contact.split('@')[0],
+                contact: user.contact,
+                icon: user.icon || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.contact)}&background=a855f7&color=fff`
+            };
+        }
+
+        await initAuth();
+
+        if (!amplifyLoaded) {
+            errBox.innerText = 'AWS Cognito is not configured or unavailable. Local account mode is enabled.';
+            errBox.classList.remove('hidden');
+        }
+
+        window.goToStep = (id) => {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('step-hidden'));
+            document.getElementById(id.startsWith('step-') ? id : `step-${id}`).classList.remove('step-hidden');
+        };
+
+        document.getElementById('signup-form').onsubmit = async (e) => {
+            e.preventDefault();
+
+            session.name = document.getElementById('reg-name').value.trim();
+            session.contact = document.getElementById('reg-contact').value.trim();
+            session.pass = document.getElementById('reg-password').value;
+
+            if (!session.name || !session.contact || !session.pass) {
+                errBox.innerText = 'Name, contact and password are required.';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            const isEmail = session.contact.includes('@');
+            const contactValue = isEmail ? session.contact : session.contact.replace(/[^0-9+]/g, '');
+            session.contact = isEmail ? contactValue : (contactValue.startsWith('+') ? contactValue : `+${contactValue}`);
+
+            errBox.classList.add('hidden');
+
+            try {
+                if (amplifyLoaded && !hasAwsPlaceholder) {
+                    const res = await Auth.signUp({
+                        username: session.contact,
+                        password: session.pass,
+                        attributes: {
+                            name: session.name,
+                            email: isEmail ? session.contact : undefined,
+                            phone_number: !isEmail ? session.contact : undefined
+                        }
+                    });
+                    console.log('signup: signUp result', res);
+                    document.getElementById('v-message').innerText = `Confirmation code sent to ${session.contact}`;
+                    goToStep('v');
+                } else {
+                    saveLocalUser({
+                        name: session.name,
+                        contact: session.contact,
+                        pass: session.pass,
+                        icon: `https://ui-avatars.com/api/?name=${encodeURIComponent(session.name)}&background=a855f7&color=fff`
+                    });
+                    const sessionData = createSession({
+                        name: session.name,
+                        contact: session.contact,
+                        icon: `https://ui-avatars.com/api/?name=${encodeURIComponent(session.name)}&background=a855f7&color=fff`
+                    });
+                    localStorage.setItem('cinexaSession', JSON.stringify(sessionData));
+                    localStorage.setItem('activeProfile', JSON.stringify(sessionData));
+                    window.location.href = 'browse.html';
+                }
+            } catch (err) {
+                console.error('signup error', err);
+                const code = err.code || (err.message && err.message.includes('UsernameExists') ? 'UsernameExistsException' : null);
+                if (code === 'UsernameExistsException') {
+                    errBox.innerHTML = 'An account with that identifier already exists. <a href="login.html" class="underline">Sign in</a> or <a href="forgot-password.html" class="underline">recover your password</a>.';
+                    errBox.classList.remove('hidden');
+                } else {
+                    errBox.innerText = 'Sign up error: ' + (err.code ? err.code + ' - ' : '') + (err.message || JSON.stringify(err));
+                    errBox.classList.remove('hidden');
+                }
+            }
+        };
+
+        window.confirmVerification = async () => {
+            const code = document.getElementById('otp-code').value.trim();
+            if (!code || code.length < 6) return alert('Enter a 6-digit confirmation code.');
+            try {
+                const res = await Auth.confirmSignUp(session.contact, code);
+                console.log('confirmVerification result', res);
+                const user = await Auth.signIn(session.contact, session.pass);
+                const sessionData = createSession({
+                    name: session.name,
+                    contact: session.contact,
+                    icon: `https://ui-avatars.com/api/?name=${encodeURIComponent(session.name)}&background=a855f7&color=fff`
+                });
+                localStorage.setItem('cinexaSession', JSON.stringify(sessionData));
+                localStorage.setItem('activeProfile', JSON.stringify(sessionData));
+                window.location.href = 'browse.html';
+            } catch (err) {
+                console.error('confirmVerification error', err);
+                alert('Verification failed: ' + (err.message || JSON.stringify(err)));
+            }
+        };
+
+    </script>
+</body>
+</html>

@@ -1,9 +1,32 @@
 {
-  "name": "cinexa",
-  "version": "1.0.0",
-  "description": "Cinexa Streaming Platform",
-  "main": "index.html",
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "redirects": [
+      {
+        "source": "/:file.html",
+        "destination": "/:file",
+        "type": 301
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
   "scripts": {
-    "start": "npx serve public"
+    "start": "node api/server.js",
+    "serve": "npx serve public"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
   }
 }

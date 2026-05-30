@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CINEXA+ | Movies & TV Shows</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        :root { --accent: #a855f7; --bg: #050505; }
+        body { background-color: var(--bg); color: white; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+
+        .hero-container { position: relative; height: 90vh; width: 100%; overflow: hidden; background: #000; }
+        #hero-video-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        
+        /* Fixed Player Scaling */
+        #player { 
+            position: absolute; top: 50%; left: 50%; 
+            width: 100vw; height: 56.25vw; 
+            min-height: 100vh; min-width: 177.77vh; 
+            transform: translate(-50%, -50%); 
+        }
+
+        .hero-vignette { position: absolute; inset: 0; background: linear-gradient(77deg, var(--bg) 0%, var(--bg) 15%, rgba(5,5,5,0.2) 50%, transparent 100%), linear-gradient(to top, var(--bg) 0%, transparent 50%); z-index: 1; }
+        .nav-item { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); }
+        .type-badge { background: var(--accent); color: white; padding: 4px 10px; border-radius: 4px; font-size: 9px; font-weight: 900; text-transform: uppercase; }
+        
+        .media-indicator { position: absolute; top: 12px; right: 12px; z-index: 30; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); color: white; font-size: 8px; font-weight: 900; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+        .movie-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; }
+        .movie-card:hover { transform: scale(1.05); z-index: 10; filter: brightness(1.2); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .plan-card { background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .plan-card:hover { border-color: var(--accent); background: rgba(168, 85, 247, 0.05); }
+
+        /* Multi-step Survey Custom Tokens */
+        .option-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s ease; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        .option-btn.selected { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); color: white; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+<nav class="fixed top-0 w-full z-[100] px-6 md:px-16 py-5 flex justify-between items-center bg-black/20 backdrop-blur-md">
+    <div class="flex items-center gap-10">
+        <h1 class="text-2xl font-[800] italic tracking-tighter cursor-pointer" onclick="window.location.href='index.html'">CINEXA<span class="text-purple-500">+</span></h1>
+        <div class="hidden lg:flex items-center gap-8">
+            <span class="nav-item active" onclick="filterType('all', this)">Home</span>
+            <span class="nav-item" onclick="filterType('movie', this)">Movies</span>
+            <span class="nav-item" onclick="filterType('tv', this)">TV Shows</span>
+        </div>
+    </div>
+    <div class="flex items-center gap-6">
+        <a href="/login.html" class="text-[11px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors">Login</a>
+        <a href="/signup.html" class="bg-purple-600 px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all">Sign Up</a>
+    </div>
+</nav>
+
+<header class="hero-container">
+    <div id="hero-video-wrapper"><div id="player"></div></div>
+    <div class="hero-vignette"></div>
+    <div class="relative z-10 px-6 md:px-20 h-full flex flex-col justify-center max-w-4xl">
+        <div class="flex items-center gap-3 mb-6">
+            <span id="hero-type" class="type-badge">Featured</span>
+            <span id="hero-year" class="text-white/60 text-xs font-bold tracking-widest">2026</span>
+        </div>
+        <h2 id="hero-title" class="text-5xl md:text-8xl font-[800] italic uppercase tracking-tighter leading-[0.85] mb-6">Loading...</h2>
+        <p id="hero-desc" class="text-white/70 text-sm md:text-lg mb-10 line-clamp-3 max-w-xl"></p>
+        <div class="flex items-center gap-4">
+            <button id="hero-play-btn" class="bg-white text-black px-10 py-4 rounded-xl font-black text-xs uppercase flex items-center gap-3 hover:bg-purple-600 hover:text-white transition-all transform active:scale-95">
+                <i class="fa-solid fa-play text-sm"></i> Play Now
+            </button>
+            <button id="hero-details-btn" class="bg-white/10 backdrop-blur-md text-white border border-white/10 px-10 py-4 rounded-xl font-black text-xs uppercase hover:bg-white/20 transition-all">
+                <i class="fa-solid fa-circle-info text-sm"></i> Details
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="relative z-20 -mt-32 space-y-20 pb-20">
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Trending Now</h3>
+        <div id="row-trending" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="px-6 md:px-20">
+        <div class="grid gap-4 md:grid-cols-2 mb-10">
+            <div class="bg-white/5 border border-white/10 rounded-[2rem] p-6 min-h-[180px] flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-[4px] text-purple-500">Sponsored</span>
+                    <h4 class="text-lg font-[800] uppercase mt-4 mb-4">Featured Partner</h4>
+                    <p class="text-white/50 text-sm leading-relaxed">Arranged promotions for CINEXA+ main feeds. This placement stays polished and does not interrupt the watch experience.</p>
+                </div>
+                <div class="w-full h-28 flex items-center justify-center bg-white/5 rounded-3xl border border-white/10">
+                    <script src="https://quge5.com/88/tag.min.js" data-zone="244492" async data-cfasync="false"></script>
+                </div>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-[2rem] p-6 min-h-[180px] flex flex-col justify-center">
+                <span class="text-[10px] font-black uppercase tracking-[4px] text-purple-500">Sponsored</span>
+                <p class="text-white/50 text-sm leading-relaxed mt-4">This ad layout is intentionally arranged and styled to match CINEXA+'s cinematic interface, keeping sponsored content neat and consistent.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="px-6 md:px-20">
+        <div class="plan-card rounded-[2rem] p-8 md:p-12 border border-white/10 relative overflow-hidden backdrop-blur-3xl">
+            <div id="survey-wizard">
+                <div id="step-1" class="space-y-6">
+                    <div class="text-center md:text-left">
+                        <span class="text-[10px] font-black tracking-[4px] text-purple-500 uppercase">Step 01 // Node Discovery</span>
+                        <h3 class="text-3xl font-[800] italic uppercase tracking-tighter mt-1">What format are you looking for?</h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                        <button onclick="setSurveyFormat('movie')" class="option-btn py-5 rounded-xl hover:bg-white/5 flex flex-col items-center gap-3">
+                            <i class="fa-solid fa-film text-xl text-purple-400"></i> Full Length Movies
+                        </button>
+                        <button onclick="setSurveyFormat('tv')" class="option-btn py-5 rounded-xl hover:bg-white/5 flex flex-col items-center gap-3">
+                            <i class="fa-solid fa-tv text-xl text-purple-400"></i> Binge TV Series
+                        </button>
+                        <button onclick="setSurveyFormat('any')" class="option-btn py-5 rounded-xl hover:bg-white/5 flex flex-col items-center gap-3">
+                            <i class="fa-solid fa-shuffle text-xl text-purple-400"></i> Surprise Me
+                        </button>
+                    </div>
+                </div>
+
+                <div id="step-2" class="hidden space-y-6">
+                    <div class="flex flex-between items-center flex-wrap gap-4">
+                        <div class="text-center md:text-left">
+                            <span class="text-[10px] font-black tracking-[4px] text-purple-500 uppercase">Step 02 // Neural Vibe Match</span>
+                            <h3 class="text-3xl font-[800] italic uppercase tracking-tighter mt-1">Pick your psychological target</h3>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 pt-4">
+                        <button onclick="submitSurvey('28,12')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Adrenaline / Action</button>
+                        <button onclick="submitSurvey('878,14')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Sci-Fi / Fantasy</button>
+                        <button onclick="submitSurvey('27,53')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Horror / Thriller</button>
+                        <button onclick="submitSurvey('18,10749')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Pure Drama / Romance</button>
+                        <button onclick="submitSurvey('35,16')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Comedy / Animation</button>
+                    </div>
+                    <button onclick="resetSurvey()" class="text-[9px] font-black uppercase text-white/40 hover:text-white tracking-widest pt-2 block"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Step 1</button>
+                </div>
+
+                <div id="step-3" class="hidden space-y-6">
+                    <div class="flex justify-between items-end border-b border-white/5 pb-4">
+                        <div>
+                            <span class="text-[10px] font-black tracking-[4px] text-purple-500 uppercase">Matches Ready</span>
+                            <h3 class="text-2xl font-[800] italic uppercase tracking-tighter">Your Custom Recommendations</h3>
+                        </div>
+                        <button onclick="resetSurvey()" class="bg-white/5 border border-white/10 hover:bg-purple-600 hover:text-white text-xs font-black uppercase tracking-widest py-2 px-6 rounded-xl transition-all">
+                            Retake Survey
+                        </button>
+                    </div>
+                    <div id="survey-results-row" class="flex gap-4 overflow-x-auto no-scrollbar py-4">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Global Top 10</h3>
+        <div id="row-top10" class="flex gap-8 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+</main>
+
+<footer class="bg-[#020202] border-t border-white/5 pt-24 pb-12 px-6 md:px-16">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+            <div class="col-span-1 md:col-span-2">
+                <h2 class="text-2xl font-[800] italic tracking-tighter mb-4">CINEXA<span class="text-purple-500">+</span></h2>
+                <p class="text-[10px] font-bold text-white/20 uppercase tracking-[2px] mb-4">An Asset of H.E.M. GROUP</p>
+                <p class="text-white/40 text-sm leading-relaxed max-w-sm">Premium digital infrastructure for global media distribution. Optimized for high-performance nodes across the H.E.M. Media Network.</p>
+            </div>
+            <div>
+                <h4 class="text-[11px] font-black uppercase tracking-[3px] text-white mb-6">Platform</h4>
+                <ul class="space-y-4 text-xs font-medium text-white/40">
+                    <li><a href="#" class="hover:text-purple-500">Originals</a></li>
+                    <li><a href="#" class="hover:text-purple-500">Live News</a></li>
+                    <li><a href="#" class="hover:text-purple-500">Stock Data</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-[11px] font-black uppercase tracking-[3px] text-white mb-6">Governance</h4>
+                <ul class="space-y-4 text-xs font-medium text-white/40">
+                    <li><a href="/privacy.html" class="hover:text-purple-500">Privacy Protocol</a></li>
+                    <li><a href="/terms.html" class="hover:text-purple-500">Terms of Service</a></li>
+                    <li class="flex items-center gap-2 pt-2">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-green-500/80">Network Operational</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <p class="text-[9px] font-black text-white/20 uppercase tracking-[4px] border-t border-white/5 pt-12">© 2026 H.E.M. GROUP MEDIA NETWORK • LAGOS | NEW YORK</p>
+    </div>
+</footer>
+
+<script>
+    const TMDB_KEY = '4166e48ae0ebb3f6693923dfe397c0b9';
+    let player;
+    let isPlayerReady = false;
+    let trendingData = [];
+    let currentHeroIndex = 0;
+    
+    // Engine State for Recommendation Survey
+    let surveyTargetFormat = 'movie';
+
+    // Load Youtube API
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            playerVars: { autoplay: 1, controls: 0, loop: 1, mute: 1, start: 20, rel: 0, modestbranding: 1 },
+            events: { 'onReady': () => { isPlayerReady = true; init(); } }
+        });
+    }
+
+    // UPDATED: Standard Local relative routing syntax to auto-generate content matching show.html query architecture
+    function goToShow(id, type) {
+        window.location.href = `show.html?id=${id}&type=${type}`;
+    }
+
+    async function init() {
+        const res = await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_KEY}`);
+        const data = await res.json();
+        trendingData = data.results;
+        
+        updateHero(trendingData[0]);
+        renderRow('row-trending', trendingData.slice(1, 15));
+        fetchTop10();
+
+        setInterval(() => {
+            currentHeroIndex = (currentHeroIndex + 1) % 5;
+            updateHero(trendingData[currentHeroIndex]);
+        }, 15000);
+    }
+
+    async function updateHero(item) {
+        const type = item.media_type || (item.title ? 'movie' : 'tv');
+        document.getElementById('hero-title').innerText = item.title || item.name;
+        document.getElementById('hero-desc').innerText = item.overview;
+        document.getElementById('hero-year').innerText = (item.release_date || item.first_air_date || '2026').split('-')[0];
+        document.getElementById('hero-type').innerText = type === 'tv' ? 'TV Series' : 'Movie';
+        
+        document.getElementById('hero-play-btn').onclick = () => goToShow(item.id, type);
+        document.getElementById('hero-details-btn').onclick = () => goToShow(item.id, type);
+
+        const vRes = await fetch(`https://api.themoviedb.org/3/${type}/${item.id}/videos?api_key=${TMDB_KEY}`);
+        const vData = await vRes.json();
+        const trailer = vData.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+
+        if (trailer && isPlayerReady) {
+            player.loadVideoById({ videoId: trailer.key, startSeconds: 20 });
+            player.mute();
+        }
+    }
+
+    function renderRow(id, items) {
+        document.getElementById(id).innerHTML = items.map(m => {
+            if (!m.poster_path) return '';
+            const type = m.media_type || (m.first_air_date ? 'tv' : 'movie');
+            return `
+            <div class="movie-card min-w-[180px] md:min-w-[220px]" onclick="goToShow('${m.id}', '${type}')">
+                <div class="media-indicator">${type === 'tv' ? 'TV' : 'Movie'}</div>
+                <div class="aspect-[2/3] rounded-xl overflow-hidden border border-white/5 bg-zinc-900">
+                    <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" class="w-full h-full object-cover">
+                </div>
+                <p class="text-[10px] font-black uppercase mt-3 truncate tracking-widest text-white/50">${m.title || m.name}</p>
+            </div>`;
+        }).join('');
+    }
+
+    async function fetchTop10() {
+        const res = await fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${TMDB_KEY}`);
+        const data = await res.json();
+        document.getElementById('row-top10').innerHTML = data.results.slice(0, 10).map((m, i) => `
+            <div class="flex items-center min-w-[260px] group cursor-pointer" onclick="goToShow('${m.id}', 'movie')">
+                <span class="text-8xl md:text-9xl font-[800] italic text-white/10 group-hover:text-purple-500 transition mr-[-25px] z-10">${i + 1}</span>
+                <div class="h-[180px] aspect-[2/3] rounded-xl border border-white/10 overflow-hidden relative z-20">
+                    <img src="https://image.tmdb.org/t/p/w400${m.poster_path}" class="w-full h-full object-cover">
+                </div>
+            </div>`).join('');
+    }
+
+    /* Recommendation Survey Internal Mechanics */
+    function setSurveyFormat(format) {
+        surveyTargetFormat = format;
+        document.getElementById('step-1').classList.add('hidden');
+        document.getElementById('step-2').classList.remove('hidden');
+    }
+
+    function resetSurvey() {
+        document.getElementById('step-2').classList.add('hidden');
+        document.getElementById('step-3').classList.add('hidden');
+        document.getElementById('step-1').classList.remove('hidden');
+    }
+
+    async function submitSurvey(genreIds) {
+        document.getElementById('step-2').classList.add('hidden');
+        document.getElementById('step-3').classList.remove('hidden');
+        
+        const targetContainer = document.getElementById('survey-results-row');
+        targetContainer.innerHTML = `<span class="text-xs text-white/40 italic animate-pulse">Running system algorithms...</span>`;
+        
+        // Resolve random surprise layouts cleanly
+        const chosenType = surveyTargetFormat === 'any' ? (Math.random() > 0.5 ? 'movie' : 'tv') : surveyTargetFormat;
+        
+        try {
+            const url = `https://api.themoviedb.org/3/discover/${chosenType}?api_key=${TMDB_KEY}&with_genres=${genreIds}&sort_by=popularity.desc&vote_count.gte=100`;
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            if(data.results && data.results.length > 0) {
+                targetContainer.innerHTML = data.results.slice(0, 10).map(m => {
+                    if (!m.poster_path) return '';
+                    return `
+                    <div class="movie-card min-w-[140px] md:min-w-[180px]" onclick="goToShow('${m.id}', '${chosenType}')">
+                        <div class="aspect-[2/3] rounded-xl overflow-hidden border border-white/5 bg-zinc-900">
+                            <img src="https://image.tmdb.org/t/p/w400${m.poster_path}" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-[10px] font-black uppercase mt-3 truncate tracking-widest text-white/60">${m.title || m.name}</p>
+                    </div>`;
+                }).join('');
+            } else {
+                targetContainer.innerHTML = `<span class="text-xs text-white/40 italic">No exact match variations found. Try another parameters.</span>`;
+            }
+        } catch(err) {
+            console.error("Survey Fetch Failure:", err);
+            targetContainer.innerHTML = `<span class="text-xs text-red-400 italic">Discovery array communication breakdown.</span>`;
+        }
+    }
+</script>
+</body>
+</html>

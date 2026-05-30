@@ -2,7 +2,9 @@
   "hosting": [
     {
       "target": "cinexa",
-      "public": "public", 
+      "public": "public",
+      "cleanUrls": true,
+      "trailingSlash": false,
       "ignore": [
         "firebase.json",
         "**/.*",
@@ -10,8 +12,8 @@
       ],
       "rewrites": [
         {
-          "source": "**",
-          "destination": "/index.html"
+          "source": "/browse",
+          "destination": "/browse.html"
         }
       ]
     }

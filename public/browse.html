@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CINEXA+ | Movies & TV Shows</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800;900&display=swap');
+
+        :root {
+            --accent: #a855f7;
+            --bg: #050505;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
+
+        .hero-container {
+            position: relative;
+            height: 90vh;
+            width: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #hero-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            filter: brightness(0.9);
+        }
+
+        #hero-video-wrapper {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+
+        #player {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100vw;
+            height: 56.25vw;
+            min-height: 100vh;
+            min-width: 177.77vh;
+            transform: translate(-50%, -50%);
+        }
+
+        .hero-vignette {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(77deg, var(--bg) 0%, var(--bg) 15%, rgba(5,5,5,0.15) 50%, transparent 100%),
+                linear-gradient(to top, var(--bg) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .nav-glass {
+            background: rgba(5,5,5,0.82);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .nav-item {
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.42);
+            cursor: pointer;
+            transition: 0.25s ease;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: white;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+        }
+
+        .movie-card {
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            filter: brightness(1.15);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .btn-signup {
+            background: var(--accent);
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.28);
+        }
+
+        .search-bar {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.25s ease;
+        }
+
+        .search-bar:focus-within {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--accent);
+            width: 260px;
+        }
+
+        .type-badge {
+            background: var(--accent);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dropdown-panel {
+            background: rgba(10,10,10,0.96);
+            backdrop-filter: blur(22px);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        }
+
+        .kids-pill {
+            background: linear-gradient(90deg, #ffde59, #ff914d);
+            color: #111;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 900;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            color: rgba(255,255,255,0.92);
+        }
+
+        .mini-label {
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,0.28);
+        }
+
+        .row-card {
+            min-width: 160px;
+        }
+
+        .top10-card {
+            min-width: 260px;
+        }
+
+        @media (min-width: 768px) {
+            .row-card { min-width: 220px; }
+        }
+    </style>
+    
+</head>
+<body class="min-h-screen">
+    
+<div id="legal-modal" class="fixed inset-0 z-[1000] flex items-center justify-center px-6 hidden">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-md"></div>
+    <div class="relative bg-zinc-900/90 border border-white/10 p-8 md:p-12 rounded-[2.5rem] max-w-lg w-full backdrop-blur-2xl shadow-2xl transform transition-all scale-95 opacity-0" id="modal-content">
+        <div class="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center mb-6">
+            <i class="fa-solid fa-circle-exclamation text-purple-500 text-xl"></i>
+        </div>
+        <h2 class="text-2xl font-[800] italic uppercase tracking-tighter mb-4">Content Disclaimer</h2>
+        <p class="text-white/50 text-sm leading-relaxed mb-8">
+            CINEXA+ is a search engine and indexing tool. <span class="text-white font-bold">We do not host, store, or upload any media files, videos, or movies on our servers.</span> 
+            All content is provided by non-affiliated third-party services. By entering, you agree that CINEXA+ is not responsible for the accuracy or legality of external content.
+        </p>
+        <button onclick="closeLegalModal()" class="w-full bg-purple-600 text-white py-4 rounded-xl font-black text-[10px] uppercase tracking-[2px] hover:bg-white hover:text-black transition-all">
+            I Understand & Enter
+        </button>
+    </div>
+</div>
+
+<div id="legal-modal" class="fixed inset-0 z-[1000] flex items-center justify-center px-6 hidden">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-md"></div>
+    <div id="modal-content" class="relative bg-zinc-900/90 border border-white/10 p-8 md:p-12 rounded-[2.5rem] max-w-lg w-full backdrop-blur-2xl shadow-2xl transform transition-all scale-95 opacity-0">
+        <div class="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center mb-6">
+            <i class="fa-solid fa-shield-halved text-purple-500 text-xl"></i>
+        </div>
+        <h2 class="text-2xl font-[800] italic uppercase tracking-tighter mb-4">Legal Protocol</h2>
+        <p class="text-white/50 text-sm leading-relaxed mb-8">
+            CINEXA+ is a digital indexing platform. <span class="text-white font-bold">We do not host or store media files on our infrastructure.</span> Content is aggregated from independent third-party providers. By continuing, you acknowledge this technical framework.
+        </p>
+        <button onclick="closeLegalModal()" class="w-full bg-white text-black py-4 rounded-xl font-black text-[10px] uppercase tracking-[2px] hover:bg-purple-600 hover:text-white transition-all">
+            Acknowledge & Enter
+        </button>
+    </div>
+</div>
+
+<nav id="main-nav" class="fixed top-0 w-full z-[100] px-6 md:px-16 py-5 flex justify-between items-center transition-all">
+    <div class="flex items-center gap-10">
+        <h1 class="text-2xl font-[800] italic tracking-tighter cursor-pointer select-none" onclick="location.reload()">
+            CINEXA<span class="text-purple-500">+</span>
+        </h1>
+
+        <div class="hidden lg:flex items-center gap-8">
+            <span class="nav-item active" data-type="all">Home</span>
+            <span class="nav-item" data-type="movie">Movies</span>
+            <span class="nav-item" data-type="tv">TV Shows</span>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-6">
+        <div class="search-bar hidden md:flex items-center px-4 py-2 rounded-full w-48 overflow-hidden">
+            <i class="fa-solid fa-magnifying-glass text-white/30 text-xs mr-3"></i>
+            <input id="search-input" type="text" placeholder="SEARCH..." class="bg-transparent border-none outline-none text-[10px] font-bold tracking-widest text-white placeholder-white/20 w-full">
+        </div>
+
+        <div id="kids-badge-container"></div>
+
+        <div id="profile-zone" class="flex items-center gap-3">
+            <img id="profile-img" src="https://i.pravatar.cc/120?img=12" class="w-10 h-10 rounded-xl object-cover border border-white/10">
+            <div class="text-right">
+                <div id="profile-name-display" class="text-[11px] font-black uppercase tracking-[2px]">Guest</div>
+                <button onclick="logout()" class="text-[10px] uppercase tracking-[3px] text-white/40 hover:text-white">Sign Out</button>
+            </div>
+        </div>
+
+        <div id="user-auth-zone" class="hidden items-center gap-6">
+            <a href="login.html" class="text-[11px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors">Login</a>
+            <a href="signup.html" class="btn-signup px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest text-white inline-block">Sign Up</a>
+        </div>
+    </div>
+</nav>
+
+<header class="hero-container">
+    <img id="hero-bg" src="" alt="" class="absolute inset-0 w-full h-full object-cover z-0">
+    <div id="hero-video-wrapper"><div id="player"></div></div>
+    <div class="hero-vignette"></div>
+
+    <div class="relative z-10 px-6 md:px-20 h-full flex flex-col justify-center max-w-4xl">
+        <div class="flex items-center gap-3 mb-6">
+            <span id="hero-type" class="type-badge">Featured</span>
+            <span id="hero-year" class="text-white/60 text-xs font-bold tracking-widest">2026</span>
+        </div>
+
+        <h2 id="hero-title" class="text-5xl md:text-8xl font-[800] italic uppercase tracking-tighter leading-[0.85] mb-6">---</h2>
+        <p id="hero-desc" class="text-white/70 text-sm md:text-lg mb-10 line-clamp-3 font-medium max-w-xl leading-relaxed"></p>
+
+        <div class="flex items-center gap-4">
+            <button id="hero-play-btn" class="bg-white text-black px-10 py-4 rounded-xl font-black text-xs uppercase flex items-center gap-3 hover:bg-purple-600 hover:text-white transition-all transform active:scale-95">
+                <i class="fa-solid fa-play text-sm"></i> Play Now
+            </button>
+
+            <button id="hero-details-btn" class="bg-white/10 backdrop-blur-md text-white border border-white/10 px-10 py-4 rounded-xl font-black text-xs uppercase flex items-center gap-3 hover:bg-white/20 transition-all">
+                <i class="fa-solid fa-circle-info text-sm"></i> Details
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="relative z-20 -mt-32 space-y-20 pb-32">
+
+    <section id="section-continue" class="pl-6 md:pl-20 hidden">
+        <div class="flex items-center justify-between pr-6 md:pr-20 mb-6">
+            <h3 class="section-title">Continue Watching</h3>
+            <span class="mini-label">Resume your last session</span>
+        </div>
+        <div id="row-continue" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section id="search-section" class="pl-6 md:pl-20 hidden pt-24">
+        <div class="flex items-center justify-between pr-6 md:pr-20 mb-6">
+            <h3 class="section-title text-purple-500">Search Results</h3>
+            <button onclick="clearSearch()" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest">Clear</button>
+        </div>
+        <div id="row-search" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 id="row-title" class="section-title mb-6">Trending Now</h3>
+        <div id="row-trending" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="px-6 md:px-20">
+        <div class="grid gap-4 md:grid-cols-2 mb-10">
+            <div class="bg-white/5 border border-white/10 rounded-[2rem] p-6 min-h-[180px] flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-black uppercase tracking-[4px] text-purple-500">Sponsored</span>
+                    <h4 class="text-lg font-[800] uppercase mt-4 mb-4">Featured Partner</h4>
+                    <p class="text-white/50 text-sm leading-relaxed">Arranged promotions for CINEXA+ main pages. This block is designed to keep ads coherent and structured.</p>
+                </div>
+                <div class="w-full h-28 flex items-center justify-center bg-white/5 rounded-3xl border border-white/10">
+                    <script src="https://quge5.com/88/tag.min.js" data-zone="244492" async data-cfasync="false"></script>
+                </div>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-[2rem] p-6 min-h-[180px] flex flex-col justify-center">
+                <span class="text-[10px] font-black uppercase tracking-[4px] text-purple-500">Sponsored</span>
+                <p class="text-white/50 text-sm leading-relaxed mt-4">The arranged ad design keeps the UX clean, while giving advertiser content a consistent visual frame.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="section-title mb-6">Recommended For You</h3>
+        <div id="row-recs" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="section-title mb-6">Top Rated</h3>
+        <div id="row-top" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="section-title mb-6">Action Picks</h3>
+        <div id="row-action" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="section-title mb-6">Sci-Fi & Future</h3>
+        <div id="row-scifi" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="section-title mb-6">Global Top 10</h3>
+        <div id="row-top10" class="flex gap-8 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+</main>
+
+<footer class="bg-[#020202] border-t border-white/5 pt-24 pb-12 px-6 md:px-16 relative z-30">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+            <div class="col-span-1 md:col-span-2 space-y-6">
+                <h2 class="text-2xl font-[800] italic uppercase tracking-tighter">CINEXA<span class="text-purple-500">+</span></h2>
+                <div class="flex items-center gap-2">
+                    <span class="text-[9px] font-black uppercase tracking-[3px] text-white/30">An Asset of</span>
+                    <span class="text-[10px] font-extrabold uppercase tracking-[2px] text-purple-500">H.E.M. GROUP</span>
+                </div>
+                <p class="text-white/40 text-xs leading-relaxed max-w-sm">
+                    Premium digital infrastructure for global media distribution. Optimized for high-performance nodes across the H.E.M. Media Network.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="text-[10px] font-black uppercase tracking-[3px] mb-6 text-white/80">Platform</h4>
+                <ul class="space-y-3 text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                    <li><a href="#" class="hover:text-purple-500 transition-colors">Originals</a></li>
+                    <li><a href="#" class="hover:text-purple-500 transition-colors">Live News</a></li>
+                    <li><a href="#" class="hover:text-purple-500 transition-colors">Stock Data</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-[10px] font-black uppercase tracking-[3px] mb-6 text-white/80">Governance</h4>
+                <ul class="space-y-3 text-[10px] font-bold text-white/40 uppercase tracking-widest mb-8">
+                    <li><a href="#" class="hover:text-purple-500 transition-colors">Privacy Protocol</a></li>
+                    <li><a href="#" class="hover:text-purple-500 transition-colors">Terms of Service</a></li>
+                </ul>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 hover:border-purple-500 transition-all text-white/40 hover:text-white"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 hover:border-blue-500 transition-all text-white/40 hover:text-white"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] font-black text-white/20 uppercase tracking-[4px]">
+            <p>© 2026 H.E.M. GROUP MEDIA NETWORK • LAGOS | NEW YORK</p>
+            <div class="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/5">
+                <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-white/40">Network Operational</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const TMDB_KEY = '4166e48ae0ebb3f6693923dfe397c0b9';
+    let player = null;
+    let pendingTrailerId = null;
+
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+
+    const cinexaSession = JSON.parse(localStorage.getItem('cinexaSession') || 'null');
+    const currentUserId = cinexaSession && cinexaSession.contact ? cinexaSession.contact : null;
+
+    if (!currentUserId) {
+        window.location.href = 'login.html';
+    }
+
+    const userRegion = getUserRegion();
+    const userHistoryKey = currentUserId ? `cinexaViewed_${encodeURIComponent(currentUserId)}` : null;
+
+    function saveUserSession(sessionData) {
+        localStorage.setItem('cinexaSession', JSON.stringify(sessionData));
+    }
+
+    function getUserHistory() {
+        if (!userHistoryKey) return [];
+        return JSON.parse(localStorage.getItem(userHistoryKey) || '[]');
+    }
+
+    function getUserRegion() {
+        const locale = navigator.language || navigator.userLanguage || 'en-US';
+        const parts = locale.split(/[-_]/);
+        let region = parts[1] || parts[0];
+        region = region.toUpperCase();
+        return region.length === 2 ? region : 'US';
+    }
+
+    function recordViewedItem(item) {
+        if (!userHistoryKey) return;
+        const history = JSON.parse(localStorage.getItem(userHistoryKey) || '[]');
+        const filtered = history.filter(i => !(i.tmdbId === item.tmdbId && i.type === item.type));
+        filtered.unshift(item);
+        localStorage.setItem(userHistoryKey, JSON.stringify(filtered.slice(0, 30)));
+    }
+
+    async function fetchPersonalizedRecommendations() {
+        const history = getUserHistory();
+        const results = [];
+
+        for (const viewed of history.slice(0, 3)) {
+            try {
+                const recData = await fetchTMDB(`${viewed.type}/${viewed.tmdbId}/recommendations`);
+                (recData.results || []).forEach(item => {
+                    if (item && item.id && !results.some(r => r.id === item.id)) {
+                        results.push(item);
+                    }
+                });
+            } catch (err) {
+                console.warn('Personal recommendation fetch failed for', viewed, err);
+            }
+        }
+
+        if (results.length === 0) {
+            const fallback = await fetchTMDB('discover/movie', {
+                region: userRegion,
+                sort_by: 'popularity.desc'
+            });
+            return fallback.results || [];
+        }
+
+        return results;
+    }
+
+    window.onYouTubeIframeAPIReady = function () {
+        player = new YT.Player('player', {
+            playerVars: {
+                autoplay: 1,
+                controls: 0,
+                mute: 1,
+                loop: 1,
+                rel: 0,
+                modestbranding: 1,
+                playsinline: 1
+            },
+            events: {
+                onReady: (e) => {
+                    e.target.mute();
+                    if (pendingTrailerId) {
+                        e.target.loadVideoById({ videoId: pendingTrailerId, startSeconds: 5 });
+                        pendingTrailerId = null;
+                    }
+                }
+            }
+        });
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+        hydrateProfileUI();
+        bindNav();
+        bindSearch();
+        bindHeroButtons();
+
+        if (!sessionStorage.getItem('legalAccepted')) {
+            const modal = document.getElementById('legal-modal');
+            const content = document.getElementById('modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => content.classList.remove('scale-95', 'opacity-0'), 100);
+        }
+
+        init('all');
+    });
+
+    function closeLegalModal() {
+        const content = document.getElementById('modal-content');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            document.getElementById('legal-modal').classList.add('hidden');
+            sessionStorage.setItem('legalAccepted', 'true');
+        }, 300);
+    }
+
+    function hydrateProfileUI() {
+        const img = cinexaSession?.icon || 'https://i.pravatar.cc/120?img=12';
+        const name = cinexaSession?.name || 'Guest';
+
+        document.getElementById('profile-img').src = img;
+        document.getElementById('profile-name-display').textContent = name;
+
+        const history = getUserHistory();
+        if (history.length > 0) {
+            document.getElementById('section-continue').classList.remove('hidden');
+            renderRow('row-continue', history.slice(0, 10));
+        }
+    }
+
+    function bindNav() {
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', async () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                await init(item.getAttribute('data-type') || 'all');
+            });
+        });
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            window.scrollY > 50 ? nav.classList.add('nav-glass') : nav.classList.remove('nav-glass');
+        });
+    }
+
+    function bindSearch() {
+        const input = document.getElementById('search-input');
+        input.addEventListener('keypress', async (e) => {
+            if (e.key !== 'Enter') return;
+            const query = e.target.value.trim();
+            if (query.length < 2) return;
+
+            const params = {
+                query: query,
+                include_adult: false
+            };
+
+            const data = await fetchTMDB('search/multi', params);
+
+            if (data.results && data.results.length > 0) {
+                document.getElementById('search-section').classList.remove('hidden');
+                renderRow('row-search', data.results);
+                document.getElementById('search-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    }
+
+    function bindHeroButtons() {
+        document.getElementById('hero-play-btn').addEventListener('click', () => {
+            const id = document.getElementById('hero-play-btn').dataset.id;
+            const type = document.getElementById('hero-play-btn').dataset.type || 'movie';
+            if (id) location.href = `show.html?id=${id}&type=${type}`;
+        });
+
+        document.getElementById('hero-details-btn').addEventListener('click', () => {
+            const id = document.getElementById('hero-details-btn').dataset.id;
+            const type = document.getElementById('hero-details-btn').dataset.type || 'movie';
+            if (id) location.href = `show.html?id=${id}&type=${type}`;
+        });
+    }
+
+    function clearSearch() {
+        document.getElementById('search-input').value = '';
+        document.getElementById('search-section').classList.add('hidden');
+        document.getElementById('row-search').innerHTML = '';
+    }
+
+    async function init(filterType = 'all') {
+        let data = { results: [] };
+        let endpoint = '';
+
+        if (filterType === 'all' || filterType === 'movie') {
+            endpoint = `discover/movie?region=${userRegion}&sort_by=popularity.desc`;
+        } else {
+            endpoint = `discover/tv?region=${userRegion}&sort_by=popularity.desc`;
+        }
+
+        data = await fetchTMDB(endpoint);
+
+        const hero = data.results?.[0];
+        if (!hero) return;
+
+        const heroType = hero.media_type || (hero.name ? 'tv' : 'movie');
+        const title = hero.title || hero.name || 'Featured Title';
+        const desc = hero.overview || 'No description available.';
+        const year = (hero.release_date || hero.first_air_date || '2026').split('-')[0];
+
+        document.getElementById('hero-title').innerText = title;
+        document.getElementById('hero-desc').innerText = desc;
+        document.getElementById('hero-year').innerText = year;
+        document.getElementById('hero-type').innerText = heroType === 'tv' ? 'TV Series' : 'Movie';
+        document.getElementById('row-title').innerText = filterType === 'all' ? `Popular in ${userRegion}` : `Trending ${filterType === 'tv' ? 'TV Shows' : 'Movies'}`;
+
+        document.getElementById('hero-play-btn').dataset.id = hero.id;
+        document.getElementById('hero-play-btn').dataset.type = heroType;
+        document.getElementById('hero-details-btn').dataset.id = hero.id;
+        document.getElementById('hero-details-btn').dataset.type = heroType;
+
+        if (hero.backdrop_path) {
+            document.getElementById('hero-bg').src = `https://image.tmdb.org/t/p/original${hero.backdrop_path}`;
+        } else {
+            document.getElementById('hero-bg').src = '';
+        }
+
+        const videoData = await fetchTMDB(`${heroType}/${hero.id}/videos`);
+        const trailer = (videoData.results || []).find(v => v.type === 'Trailer' && v.site === 'YouTube');
+
+        if (trailer) {
+            playTrailer(trailer.key);
+            document.getElementById('hero-video-wrapper').style.opacity = '1';
+        } else {
+            document.getElementById('hero-video-wrapper').style.opacity = '0';
+        }
+
+        renderRow('row-trending', (data.results || []).slice(1, 15));
+
+        const customRecs = await fetchPersonalizedRecommendations();
+        renderRow('row-recs', customRecs);
+
+        const top = await fetchTMDB('movie/top_rated');
+        renderRow('row-top', top.results || []);
+
+        const action = await fetchTMDB('discover/movie', {
+            with_genres: '28',
+            sort_by: 'popularity.desc'
+        });
+        renderRow('row-action', action.results || []);
+
+        const scifi = await fetchTMDB('discover/movie', {
+            with_genres: '878',
+            sort_by: 'popularity.desc'
+        });
+        renderRow('row-scifi', scifi.results || []);
+
+        const top10 = await fetchTMDB('movie/top_rated');
+        renderTop10(top10.results || []);
+    }
+
+    async function fetchTMDB(path, params = {}) {
+        const url = new URL(`https://api.themoviedb.org/3/${path}`);
+        url.searchParams.set('api_key', TMDB_KEY);
+
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                url.searchParams.set(key, value);
+            }
+        });
+
+        const res = await fetch(url.toString());
+        return await res.json();
+    }
+
+    function playTrailer(videoId) {
+        if (!videoId) return;
+
+        if (player && player.loadVideoById) {
+            player.loadVideoById({ videoId, startSeconds: 5 });
+        } else {
+            pendingTrailerId = videoId;
+        }
+    }
+
+    function renderRow(id, items) {
+        const row = document.getElementById(id);
+        if (!row) return;
+
+        row.innerHTML = items
+            .filter(m => m && m.poster_path)
+            .map(m => {
+                const type = m.media_type || (m.name ? 'tv' : 'movie');
+                const label = type === 'tv' ? 'TV' : 'Movie';
+                const title = m.title || m.name || 'Untitled';
+
+                return `
+                    <div onclick="location.href='show.html?id=${m.id}&type=${type}'" class="movie-card row-card min-w-[160px] md:min-w-[220px] relative">
+                        <span class="absolute top-2 right-2 z-20 bg-black/60 backdrop-blur-md text-[8px] font-black px-2 py-1 rounded uppercase border border-white/10">
+                            ${label}
+                        </span>
+                        <div class="aspect-[2/3] rounded-xl overflow-hidden border border-white/5 bg-zinc-900">
+                            <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" alt="${title}" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-[10px] font-black uppercase mt-3 truncate tracking-widest text-white/70">${title}</p>
+                    </div>
+                `;
+            }).join('');
+    }
+
+    function renderTop10(items) {
+        const row = document.getElementById('row-top10');
+        if (!row) return;
+
+        row.innerHTML = items.slice(0, 10).map((m, i) => `
+            <div onclick="location.href='show.html?id=${m.id}&type=movie'" class="flex items-center top10-card group cursor-pointer">
+                <span class="text-8xl md:text-9xl font-[800] italic text-white/10 group-hover:text-purple-500 transition duration-500 mr-[-25px] z-10 select-none">
+                    ${i + 1}
+                </span>
+                <div class="h-[180px] aspect-[2/3] rounded-xl border border-white/10 shadow-2xl relative z-20 overflow-hidden bg-zinc-900">
+                    <img src="https://image.tmdb.org/t/p/w400${m.poster_path}" class="w-full h-full object-cover" alt="${m.title || m.name || 'Top title'}">
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function logout() {
+        localStorage.removeItem('cinexaSession');
+        location.href = 'login.html';
+    }
+
+    window.closeLegalModal = closeLegalModal;
+    window.clearSearch = clearSearch;
+    window.logout = logout;
+</script>
+
+</body>
+</html>

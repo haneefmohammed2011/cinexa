@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cinexa serverless infra (Cognito, API, DynamoDB)
+
+Resources:
+  CinexaUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: CinexaUserPool
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+
+  CinexaUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: CinexaWebClient
+      UserPoolId: !Ref CinexaUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+        - USER_PASSWORD_AUTH
+
+  ProfilesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: CinexaProfiles
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: profileId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: profileId
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  ProfilesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CinexaProfilesHandler
+      Handler: index.handler
+      Runtime: nodejs18.x
+      CodeUri: aws/lambda/profiles/
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ProfilesTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProfilesTable
+      Events:
+        ProfilesApi:
+          Type: Api
+          Properties:
+            Path: /users/{userId}/profiles
+            Method: ANY
+            RestApiId: !Ref CinexaApi
+
+  CinexaApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: CinexaApi
+      StageName: prod
+
+Outputs:
+  UserPoolId:
+    Description: Cognito User Pool Id
+    Value: !Ref CinexaUserPool
+
+  UserPoolClientId:
+    Description: Cognito Web Client Id
+    Value: !Ref CinexaUserPoolClient
+
+  ApiUrl:
+    Description: Base URL for API
+    Value: !Sub "https://${CinexaApi}.execute-api.${AWS::Region}.amazonaws.com/prod"

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Access | CINEXA+</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        :root { --accent: #a855f7; --bg: #020202; }
+        body { background-color: var(--bg); color: white; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
+        .plan-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
+        .plan-card:hover { transform: translateY(-10px); border-color: var(--accent); background: rgba(168, 85, 247, 0.04); }
+        
+        .exclusive-glow { box-shadow: 0 0 40px rgba(168, 85, 247, 0.15); }
+        .voucher-input { background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .voucher-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
+        
+        .status-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 10px #22c55e; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <nav class="p-8 flex justify-between items-center">
+        <h1 class="text-2xl font-[800] italic tracking-tighter cursor-pointer" onclick="window.location.href='index.html'">
+            CINEXA<span class="text-purple-500">+</span>
+        </h1>
+        <div id="user-status" class="text-[10px] font-black uppercase tracking-[3px] text-white/40">
+            <span class="status-dot"></span> Secure Terminal
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="text-center mb-16">
+            <h2 class="text-5xl md:text-7xl font-[800] italic uppercase tracking-tighter mb-4">Select Your <span class="text-purple-500">Node</span></h2>
+            <p class="text-white/40 max-w-2xl mx-auto text-sm">Voucher-only access enabled for H.E.M. Group Assets. Credit cards are currently de-authorized.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+            <div class="plan-card glass-card rounded-[2.5rem] p-10 flex flex-col">
+                <h3 class="text-2xl font-bold mb-4">Standard</h3>
+                <p class="text-purple-500 font-black text-xs mb-6 tracking-widest uppercase">Silver Tier</p>
+                <ul class="space-y-4 mb-10 flex-grow text-sm text-white/60">
+                    <li><i class="fa-solid fa-check mr-2 text-purple-500"></i> 1080p HD Streaming</li>
+                    <li><i class="fa-solid fa-check mr-2 text-purple-500"></i> 1 Active Screen</li>
+                    <li><i class="fa-solid fa-check mr-2 text-purple-500"></i> Global Library Access</li>
+                </ul>
+            </div>
+
+            <div class="plan-card glass-card rounded-[2.5rem] p-10 flex flex-col border-purple-500/40 exclusive-glow bg-gradient-to-b from-purple-500/5 to-transparent scale-105">
+                <h3 class="text-2xl font-bold mb-4">Ultra 4K</h3>
+                <p class="text-purple-500 font-black text-xs mb-6 tracking-widest uppercase">Gold Tier</p>
+                <ul class="space-y-4 mb-10 flex-grow text-sm text-white/90">
+                    <li><i class="fa-solid fa-check mr-2 text-purple-500"></i> 4K Ultra HD + HDR</li>
+                    <li><i class="fa-solid fa-check mr-2 text-purple-500"></i> 4 Concurrent Devices</li>
+                    <li><i class="fa-solid fa-check mr-2 text-purple-500"></i> Spatial Audio Node</li>
+                </ul>
+            </div>
+
+            <div class="plan-card glass-card rounded-[2.5rem] p-10 flex flex-col">
+                <h3 class="text-2xl font-bold mb-4">Network Pro</h3>
+                <p class="text-purple-500 font-black text-xs mb-6 tracking-widest uppercase">Black Tier</p>
+                <ul class="space-y-4 mb-10 flex-grow text-sm text-white/60">
+                    <li><i class="fa-solid fa-check mr-2 text-purple-500"></i> 8K Experimental Access</li>
+                    <li><i class="fa-solid fa-check mr-2 text-purple-500"></i> Early Launch Originals</li>
+                    <li><i class="fa-solid fa-check mr-2 text-purple-500"></i> Unlimited Device Nodes</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="max-w-2xl mx-auto glass-card rounded-[3rem] p-12 text-center border-dashed border-white/20">
+            <h4 class="text-2xl font-bold uppercase italic tracking-tighter mb-6">Redeem Launch Voucher</h4>
+            <div class="flex flex-col gap-4">
+                <input type="text" id="voucher-input" placeholder="XXXX-2026-XXXX" 
+                       class="voucher-input w-full rounded-2xl px-6 py-4 text-center font-mono tracking-[0.2em] uppercase text-purple-400">
+                <button onclick="redeemProcess()" id="redeem-btn" 
+                        class="w-full bg-white text-black py-5 rounded-2xl font-black text-xs uppercase hover:bg-purple-600 hover:text-white transition-all">
+                    Activate Subscription
+                </button>
+            </div>
+            <p id="status-msg" class="mt-6 text-[10px] font-bold text-white/20 uppercase tracking-widest">Authorized for H.E.M. Party invites only</p>
+        </div>
+    </main>
+
+    <script>
+        const cinexaSession = JSON.parse(localStorage.getItem('cinexaSession') || 'null');
+        const currentUserId = cinexaSession && cinexaSession.contact ? cinexaSession.contact : null;
+
+        if (currentUserId) {
+            document.getElementById('user-status').innerHTML = `<span class="status-dot"></span> Connected: ${currentUserId}`;
+        } else {
+            document.getElementById('user-status').innerHTML = `<span class="status-dot" style="background:#ef4444; box-shadow:0 0 10px #ef4444"></span> Disconnected (Login Required)`;
+        }
+
+        window.redeemProcess = function() {
+            const code = document.getElementById('voucher-input').value.trim().toUpperCase();
+            const btn = document.getElementById('redeem-btn');
+            const msg = document.getElementById('status-msg');
+
+            if (!currentUserId) {
+                alert('You must be logged in to activate a voucher.');
+                return;
+            }
+
+            if (!code) return;
+
+            btn.disabled = true;
+            btn.innerText = 'AUTHENTICATING NODE...';
+
+            let targetPlan = '';
+            if (code.startsWith('SILV')) targetPlan = 'Standard';
+            else if (code.startsWith('GOLD')) targetPlan = 'Ultra 4K';
+            else if (code.startsWith('BLCK')) targetPlan = 'Network Pro';
+
+            if (!targetPlan) {
+                msg.innerText = 'INVALID VOUCHER CODE';
+                msg.style.color = '#ef4444';
+                btn.disabled = false;
+                btn.innerText = 'ACTIVATE SUBSCRIPTION';
+                return;
+            }
+
+            localStorage.setItem(`cinexaPlan_${encodeURIComponent(currentUserId)}`, targetPlan);
+            msg.innerText = `ACCESS GRANTED: ${targetPlan.toUpperCase()} ONLINE`;
+            msg.style.color = '#22c55e';
+            btn.innerText = 'SUCCESS';
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
