@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | CINEXA+</title>
+        <link rel="icon" type="image/jpeg" href="Cinexa v2 Logo.jpeg">
+    <meta name="theme-color" content="#050505">
+<title>Login | CINEXA+</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -169,10 +171,17 @@
         return getLocalUsers().find(user => user.contact === contact);
     }
 
-    function signInLocal(contact, password) {
+    async function hashPassword(password) {
+        const data = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function signInLocal(contact, password) {
         const user = getLocalUser(contact);
         if (!user) throw new Error('User not found. Please sign up first.');
-        if (user.pass !== password) throw new Error('Incorrect password.');
+        const hashed = await hashPassword(password);
+        if (user.passHash !== hashed) throw new Error('Incorrect password.');
         return user;
     }
 
@@ -190,11 +199,6 @@
     const btn = document.getElementById('submitBtn');
     const loginError = document.getElementById('login-error');
 
-    if (!amplifyLoaded) {
-        loginError.textContent = 'AWS Cognito is not configured or unavailable. Using local account mode.';
-        loginError.classList.remove('hidden');
-    }
-
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -210,7 +214,7 @@
             if (amplifyLoaded && !hasAwsPlaceholder) {
                 user = await Auth.signIn(email, password);
             } else {
-                user = signInLocal(email, password);
+                user = await signInLocal(email, password);
             }
 
             const sessionData = createSession({

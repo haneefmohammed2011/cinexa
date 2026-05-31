@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CINEXA+ V2.0 | Movies & TV Shows</title>
+        <link rel="icon" type="image/jpeg" href="Cinexa v2 Logo.jpeg">
+    <meta name="theme-color" content="#050505">
+<title>CINEXA+ V2.0 | Movies & TV Shows</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -51,19 +53,30 @@
         .option-btn.selected { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); color: white; }
     </style>
 </head>
+<body>
 
-<nav class="fixed top-0 w-full z-[100] px-6 md:px-16 py-5 flex justify-between items-center bg-black/20 backdrop-blur-md">
-    <div class="flex items-center gap-10">
+<nav class="fixed top-0 w-full z-[100] px-4 md:px-16 py-4 flex flex-col md:flex-row justify-between items-center gap-4 bg-black/20 backdrop-blur-md">
+    <div class="flex items-center gap-8 flex-wrap">
         <h1 class="text-2xl font-[800] italic tracking-tighter cursor-pointer" onclick="window.location.href='index.html'">CINEXA<span class="text-purple-500">+</span></h1>
-        <div class="hidden lg:flex items-center gap-8">
+        <div class="nav-menu items-center gap-4">
             <span class="nav-item active" onclick="filterType('all', this)">Home</span>
             <span class="nav-item" onclick="filterType('movie', this)">Movies</span>
             <span class="nav-item" onclick="filterType('tv', this)">TV Shows</span>
+            <span class="nav-item" onclick="filterType('family', this)">Family</span>
+            <span class="nav-item" onclick="filterType('kids', this)">Kids</span>
+            <span class="nav-item" onclick="filterType('comedy', this)">Comedy</span>
+            <span class="nav-item" onclick="filterType('drama', this)">Drama</span>
+            <span class="nav-item" onclick="filterType('docs', this)">Docs</span>
         </div>
     </div>
-    <div class="flex items-center gap-6">
-        <a href="/login.html" class="text-[11px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors">Login</a>
-        <a href="/signup.html" class="bg-purple-600 px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all">Sign Up</a>
+    <div class="flex items-center gap-4 flex-wrap justify-end w-full md:w-auto">
+        <div class="search-bar flex items-center px-4 py-2 rounded-full overflow-hidden max-w-[420px] w-full bg-white/5 border border-white/10">
+            <i class="fa-solid fa-magnifying-glass text-white/40 text-sm mr-3"></i>
+            <input id="search-input" type="text" placeholder="Search for any show..." class="bg-transparent border-none outline-none text-sm font-bold text-white placeholder:text-white/30 w-full" autocomplete="off">
+        </div>
+
+        <a href="login.html" class="text-[11px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors">Login</a>
+        <a href="signup.html" class="bg-purple-600 px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest text-white hover:bg-white hover:text-black transition-all">Sign Up</a>
     </div>
 </nav>
 
@@ -76,7 +89,8 @@
             <span id="hero-year" class="text-white/60 text-xs font-bold tracking-widest">2026</span>
         </div>
         <h2 id="hero-title" class="text-5xl md:text-8xl font-[800] italic uppercase tracking-tighter leading-[0.85] mb-6">Loading...</h2>
-        <p id="hero-desc" class="text-white/70 text-sm md:text-lg mb-10 line-clamp-3 max-w-xl"></p>
+        <p id="hero-desc" class="text-white/70 text-sm md:text-lg mb-4 line-clamp-3 max-w-xl"></p>
+        <p class="text-white/40 text-xs md:text-sm uppercase tracking-[3px] mb-10 max-w-xl">AI-powered recommendations tuned to your region and mood, updated live from trending searches.</p>
         <div class="flex items-center gap-4">
             <button id="hero-play-btn" class="bg-white text-black px-10 py-4 rounded-xl font-black text-xs uppercase flex items-center gap-3 hover:bg-purple-600 hover:text-white transition-all transform active:scale-95">
                 <i class="fa-solid fa-play text-sm"></i> Play Now
@@ -93,93 +107,101 @@
         <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Trending Now</h3>
         <div id="row-trending" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
     </section>
+
 <!-- Sponsored Section -->
 <section class="px-6 md:px-20 mb-10">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        <!-- AD CONTAINER: Use this for a proper Banner -->
         <div class="bg-white/5 border border-white/10 rounded-[2rem] p-6 min-h-[250px] relative overflow-hidden flex flex-col">
             <span class="text-[10px] font-black uppercase tracking-[4px] text-purple-500 mb-4">Sponsored</span>
-            
-            <div id="ad-sandbox" class="w-full h-full flex items-center justify-center">
-                <!-- ONLY PASTE A "BANNER" OR "IN-PAGE PUSH" SCRIPT HERE -->
-                <!-- DO NOT PASTE THE (function(s)...) SCRIPT HERE -->
-            </div>
+            <div id="ad-sandbox" class="w-full h-full flex items-center justify-center"></div>
         </div>
 
-        <!-- Informational Card -->
-        <div class="bg-white/5 border border-white/10 rounded-[2rem] p-6 flex flex-col justify-center">
-            <span class="text-[10px] font-black uppercase tracking-[4px] text-purple-500">About</span>
-            <p class="text-white/50 text-sm leading-relaxed mt-4">
-                This space is reserved for premium partner content. Our ad infrastructure ensures a seamless cinematic experience.
-            </p>
-        </div>
-    </div>
-</section>
-
-<style>
-    /* This force-locks the ad to the sandbox */
-    #ad-sandbox {
-        position: relative !important;
-        display: block !important;
-        width: 100% !important;
-        height: 100% !important;
-    }
-</style>
-
-    <section class="px-6 md:px-20">
-        <div class="plan-card rounded-[2rem] p-8 md:p-12 border border-white/10 relative overflow-hidden backdrop-blur-3xl">
-            <div id="survey-wizard">
+        <div class="bg-white/5 border border-white/10 rounded-[2rem] p-6 flex flex-col justify-between">
+            <div id="survey-wizard" class="space-y-6">
                 <div id="step-1" class="space-y-6">
                     <div class="text-center md:text-left">
                         <span class="text-[10px] font-black tracking-[4px] text-purple-500 uppercase">Step 01 // Node Discovery</span>
                         <h3 class="text-3xl font-[800] italic uppercase tracking-tighter mt-1">What format are you looking for?</h3>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-                        <button onclick="setSurveyFormat('movie')" class="option-btn py-5 rounded-xl hover:bg-white/5 flex flex-col items-center gap-3">
+                        <button type="button" data-survey-option="movie" onclick="setSurveyFormat('movie')" class="option-btn py-5 rounded-xl hover:bg-white/5 flex flex-col items-center gap-3">
                             <i class="fa-solid fa-film text-xl text-purple-400"></i> Full Length Movies
                         </button>
-                        <button onclick="setSurveyFormat('tv')" class="option-btn py-5 rounded-xl hover:bg-white/5 flex flex-col items-center gap-3">
+                        <button type="button" data-survey-option="tv" onclick="setSurveyFormat('tv')" class="option-btn py-5 rounded-xl hover:bg-white/5 flex flex-col items-center gap-3">
                             <i class="fa-solid fa-tv text-xl text-purple-400"></i> Binge TV Series
                         </button>
-                        <button onclick="setSurveyFormat('any')" class="option-btn py-5 rounded-xl hover:bg-white/5 flex flex-col items-center gap-3">
+                        <button type="button" data-survey-option="any" onclick="setSurveyFormat('any')" class="option-btn py-5 rounded-xl hover:bg-white/5 flex flex-col items-center gap-3">
                             <i class="fa-solid fa-shuffle text-xl text-purple-400"></i> Surprise Me
                         </button>
                     </div>
                 </div>
 
-                <div id="step-2" class="hidden space-y-6">
-                    <div class="flex flex-between items-center flex-wrap gap-4">
-                        <div class="text-center md:text-left">
-                            <span class="text-[10px] font-black tracking-[4px] text-purple-500 uppercase">Step 02 // Neural Vibe Match</span>
-                            <h3 class="text-3xl font-[800] italic uppercase tracking-tighter mt-1">Pick your psychological target</h3>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 pt-4">
-                        <button onclick="submitSurvey('28,12')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Adrenaline / Action</button>
-                        <button onclick="submitSurvey('878,14')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Sci-Fi / Fantasy</button>
-                        <button onclick="submitSurvey('27,53')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Horror / Thriller</button>
-                        <button onclick="submitSurvey('18,10749')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Pure Drama / Romance</button>
-                        <button onclick="submitSurvey('35,16')" class="option-btn py-4 px-2 rounded-xl hover:bg-purple-500/10">Comedy / Animation</button>
-                    </div>
-                    <button onclick="resetSurvey()" class="text-[9px] font-black uppercase text-white/40 hover:text-white tracking-widest pt-2 block"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Step 1</button>
-                </div>
-
-                <div id="step-3" class="hidden space-y-6">
-                    <div class="flex justify-between items-end border-b border-white/5 pb-4">
+                <div class="mt-6">
+                    <div class="w-full h-28 flex items-center justify-center bg-white/5 rounded-3xl border border-white/10 p-6 text-center">
                         <div>
-                            <span class="text-[10px] font-black tracking-[4px] text-purple-500 uppercase">Matches Ready</span>
-                            <h3 class="text-2xl font-[800] italic uppercase tracking-tighter">Your Custom Recommendations</h3>
+                            <span class="text-[10px] font-black uppercase tracking-[4px] text-purple-500">Discover</span>
+                            <h3 class="text-3xl font-[800] italic uppercase tracking-tighter mt-4">Recommended for Your Region</h3>
+                            <p class="text-white/50 text-sm leading-relaxed mt-4">Our region-aware recommendation engine scans trending titles and serves smart suggestions without any extra input.</p>
                         </div>
-                        <button onclick="resetSurvey()" class="bg-white/5 border border-white/10 hover:bg-purple-600 hover:text-white text-xs font-black uppercase tracking-widest py-2 px-6 rounded-xl transition-all">
-                            Retake Survey
-                        </button>
                     </div>
-                    <div id="survey-results-row" class="flex gap-4 overflow-x-auto no-scrollbar py-4">
-                        </div>
                 </div>
             </div>
         </div>
+    </div>
+</section>
+
+<section id="search-section" class="pl-6 md:pl-20 hidden pt-4">
+
+        <div class="flex items-center justify-between pr-6 md:pr-20 mb-6">
+            <h3 class="text-xl font-[800] italic uppercase tracking-tight text-purple-500">Search Results</h3>
+            <button onclick="clearSearch()" class="text-[10px] font-bold text-white/40 hover:text-white uppercase tracking-widest">Clear</button>
+        </div>
+        <div id="row-search" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+    
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Recommended For You</h3>
+        <div id="row-recommended" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Top Rated</h3>
+        <div id="row-top-rated" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Action Picks</h3>
+        <div id="row-action" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Sci-Fi & Future</h3>
+        <div id="row-sci" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Family Favorites</h3>
+        <div id="row-family" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Kids Corner</h3>
+        <div id="row-kids" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Comedy Classics</h3>
+        <div id="row-comedy" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Drama Essentials</h3>
+        <div id="row-drama" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
+    </section>
+
+    <section class="pl-6 md:pl-20">
+        <h3 class="text-xl font-[800] italic uppercase tracking-tight mb-6 text-white/90">Documentary Spotlight</h3>
+        <div id="row-docs" class="flex gap-4 overflow-x-auto no-scrollbar pr-20 py-4"></div>
     </section>
 
     <section class="pl-6 md:pl-20">
@@ -226,9 +248,9 @@
     let isPlayerReady = false;
     let trendingData = [];
     let currentHeroIndex = 0;
-    
-    // Engine State for Recommendation Survey
-    let surveyTargetFormat = 'movie';
+    let heroRotationTimer = null;
+    let appStarted = false;
+    let surveyFormat = 'any';
 
     // Load Youtube API
     const tag = document.createElement('script');
@@ -238,29 +260,186 @@
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
             playerVars: { autoplay: 1, controls: 0, loop: 1, mute: 1, start: 20, rel: 0, modestbranding: 1 },
-            events: { 'onReady': () => { isPlayerReady = true; init(); } }
+            events: {
+                'onReady': () => {
+                    isPlayerReady = true;
+                    startApp();
+                }
+            }
         });
     }
+
+    function startApp() {
+        if (appStarted) return;
+        appStarted = true;
+        init('all');
+    }
+
+    window.addEventListener('load', () => {
+        setTimeout(startApp, 2500);
+    });
 
     // UPDATED: Standard Local relative routing syntax to auto-generate content matching show.html query architecture
     function goToShow(id, type) {
         window.location.href = `show.html?id=${id}&type=${type}`;
     }
 
-    async function init() {
-        const res = await fetch(`https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_KEY}`);
-        const data = await res.json();
-        trendingData = data.results;
-        
+
+async function init(filterType = 'all') {
+    const region = getUserRegion();
+    let data;
+
+    if (heroRotationTimer) {
+        clearInterval(heroRotationTimer);
+        heroRotationTimer = null;
+    }
+
+    try {
+        if (filterType === 'movie') {
+            data = await fetchTMDB('discover/movie', { region, sort_by: 'popularity.desc' });
+        } else if (filterType === 'tv') {
+            data = await fetchTMDB('discover/tv', { region, sort_by: 'popularity.desc' });
+        } else if (filterType === 'family') {
+            data = await fetchTMDB('discover/movie', { region, with_genres: '10751', sort_by: 'popularity.desc' });
+        } else if (filterType === 'kids') {
+            data = await fetchTMDB('discover/movie', { region, with_genres: '16', sort_by: 'popularity.desc' });
+        } else if (filterType === 'comedy') {
+            data = await fetchTMDB('discover/movie', { region, with_genres: '35', sort_by: 'popularity.desc' });
+        } else if (filterType === 'drama') {
+            data = await fetchTMDB('discover/movie', { region, with_genres: '18', sort_by: 'popularity.desc' });
+        } else if (filterType === 'docs') {
+            data = await fetchTMDB('discover/movie', { region, with_genres: '99', sort_by: 'popularity.desc' });
+        } else {
+            data = await fetchTMDB('trending/all/day', { region });
+        }
+
+        trendingData = data.results || [];
+        currentHeroIndex = 0;
+
+        if (!trendingData.length) {
+            document.getElementById('row-trending').innerHTML = '<span class="text-sm text-white/40 italic">Unable to load titles. Please refresh.</span>';
+            return;
+        }
+
         updateHero(trendingData[0]);
         renderRow('row-trending', trendingData.slice(1, 15));
+        renderRow('row-recommended', trendingData.slice(0, 15));
+
+        const [
+            topRated,
+            action,
+            sciFi,
+            family,
+            kids,
+            comedy,
+            drama,
+            docs
+        ] = await Promise.all([
+            fetchTMDB('discover/movie', { region, sort_by: 'popularity.desc' }),
+            fetchTMDB('discover/movie', { region, with_genres: '28', sort_by: 'popularity.desc' }),
+            fetchTMDB('discover/movie', { region, with_genres: '878', sort_by: 'popularity.desc' }),
+            fetchTMDB('discover/movie', { region, with_genres: '10751', sort_by: 'popularity.desc' }),
+            fetchTMDB('discover/movie', { region, with_genres: '16', sort_by: 'popularity.desc' }),
+            fetchTMDB('discover/movie', { region, with_genres: '35', sort_by: 'popularity.desc' }),
+            fetchTMDB('discover/movie', { region, with_genres: '18', sort_by: 'popularity.desc' }),
+            fetchTMDB('discover/movie', { region, with_genres: '99', sort_by: 'popularity.desc' })
+        ]);
+
+        renderRow('row-top-rated', topRated.results.slice(0, 15));
+        renderRow('row-action', action.results.slice(0, 15));
+        renderRow('row-sci', sciFi.results.slice(0, 15));
+        renderRow('row-family', family.results.slice(0, 15));
+        renderRow('row-kids', kids.results.slice(0, 15));
+        renderRow('row-comedy', comedy.results.slice(0, 15));
+        renderRow('row-drama', drama.results.slice(0, 15));
+        renderRow('row-docs', docs.results.slice(0, 15));
+
         fetchTop10();
 
-        setInterval(() => {
-            currentHeroIndex = (currentHeroIndex + 1) % 5;
+        heroRotationTimer = setInterval(() => {
+            currentHeroIndex = (currentHeroIndex + 1) % Math.max(trendingData.length, 1);
             updateHero(trendingData[currentHeroIndex]);
         }, 15000);
+    } catch (error) {
+        console.error('Initialization failed:', error);
+        document.getElementById('row-trending').innerHTML = '<span class="text-sm text-white/40 italic">Unable to load titles right now.</span>';
     }
+}
+
+    async function filterType(type, element) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        if (element) element.classList.add('active');
+        await init(type);
+    }
+async function setSurveyFormat(format) {
+    surveyFormat = format;
+
+    document.querySelectorAll('[data-survey-option]').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+
+    const selectedBtn = document.querySelector(
+        `[data-survey-option="${format}"]`
+    );
+
+    if (selectedBtn) {
+        selectedBtn.classList.add('selected');
+    }
+
+    let targetType;
+
+    switch (format) {
+        case 'movie':
+            targetType = 'movie';
+            break;
+
+        case 'tv':
+            targetType = 'tv';
+            break;
+
+        case 'any':
+            const options = [
+                'movie',
+                'tv',
+                'family',
+                'kids',
+                'comedy',
+                'drama',
+                'docs'
+            ];
+
+            targetType =
+                options[Math.floor(Math.random() * options.length)];
+            break;
+
+        default:
+            targetType = 'all';
+    }
+
+    document.getElementById('row-recommended').innerHTML =
+        '<span class="text-white/50 text-sm">Loading recommendations...</span>';
+
+    await init(targetType);
+
+    const recommendedSection =
+        document.getElementById('row-recommended');
+
+    if (recommendedSection) {
+        recommendedSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+
+    if (trendingData.length > 0) {
+        const randomItem =
+            trendingData[
+                Math.floor(Math.random() * trendingData.length)
+            ];
+
+        updateHero(randomItem);
+    }
+}
 
     async function updateHero(item) {
         const type = item.media_type || (item.title ? 'movie' : 'tv');
@@ -298,7 +477,7 @@
     }
 
     async function fetchTop10() {
-        const res = await fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${TMDB_KEY}`);
+        const res = await fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${TMDB_KEY}&region=${getUserRegion()}`);
         const data = await res.json();
         document.getElementById('row-top10').innerHTML = data.results.slice(0, 10).map((m, i) => `
             <div class="flex items-center min-w-[260px] group cursor-pointer" onclick="goToShow('${m.id}', 'movie')">
@@ -309,53 +488,56 @@
             </div>`).join('');
     }
 
-    /* Recommendation Survey Internal Mechanics */
-    function setSurveyFormat(format) {
-        surveyTargetFormat = format;
-        document.getElementById('step-1').classList.add('hidden');
-        document.getElementById('step-2').classList.remove('hidden');
+    function getUserRegion() {
+        const locale = navigator.language || navigator.userLanguage || 'en-US';
+        const parts = locale.split(/[-_]/);
+        const region = parts[1] || parts[0];
+        return region && region.length === 2 ? region.toUpperCase() : 'US';
     }
 
-    function resetSurvey() {
-        document.getElementById('step-2').classList.add('hidden');
-        document.getElementById('step-3').classList.add('hidden');
-        document.getElementById('step-1').classList.remove('hidden');
-    }
+    async function bindSearch() {
+        const input = document.getElementById('search-input');
+        if (!input) return;
 
-    async function submitSurvey(genreIds) {
-        document.getElementById('step-2').classList.add('hidden');
-        document.getElementById('step-3').classList.remove('hidden');
-        
-        const targetContainer = document.getElementById('survey-results-row');
-        targetContainer.innerHTML = `<span class="text-xs text-white/40 italic animate-pulse">Running system algorithms...</span>`;
-        
-        // Resolve random surprise layouts cleanly
-        const chosenType = surveyTargetFormat === 'any' ? (Math.random() > 0.5 ? 'movie' : 'tv') : surveyTargetFormat;
-        
-        try {
-            const url = `https://api.themoviedb.org/3/discover/${chosenType}?api_key=${TMDB_KEY}&with_genres=${genreIds}&sort_by=popularity.desc&vote_count.gte=100`;
-            const res = await fetch(url);
-            const data = await res.json();
-            
-            if(data.results && data.results.length > 0) {
-                targetContainer.innerHTML = data.results.slice(0, 10).map(m => {
-                    if (!m.poster_path) return '';
-                    return `
-                    <div class="movie-card min-w-[140px] md:min-w-[180px]" onclick="goToShow('${m.id}', '${chosenType}')">
-                        <div class="aspect-[2/3] rounded-xl overflow-hidden border border-white/5 bg-zinc-900">
-                            <img src="https://image.tmdb.org/t/p/w400${m.poster_path}" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-[10px] font-black uppercase mt-3 truncate tracking-widest text-white/60">${m.title || m.name}</p>
-                    </div>`;
-                }).join('');
+        input.addEventListener('keypress', async (event) => {
+            if (event.key !== 'Enter') return;
+            const query = event.target.value.trim();
+            if (query.length < 2) return;
+
+            document.getElementById('search-section').classList.remove('hidden');
+            document.getElementById('row-search').innerHTML = '<span class="text-sm text-white/40 italic">Searching regionally for live results...</span>';
+
+            const data = await fetchTMDB('search/multi', { query, include_adult: false, region: getUserRegion() });
+
+            if (data && data.results && data.results.length) {
+                document.getElementById('row-search').innerHTML = '';
+                renderRow('row-search', data.results);
+                document.getElementById('search-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
             } else {
-                targetContainer.innerHTML = `<span class="text-xs text-white/40 italic">No exact match variations found. Try another parameters.</span>`;
+                document.getElementById('row-search').innerHTML = '<span class="text-sm text-white/40 italic">No results found. Try another title.</span>';
             }
-        } catch(err) {
-            console.error("Survey Fetch Failure:", err);
-            targetContainer.innerHTML = `<span class="text-xs text-red-400 italic">Discovery array communication breakdown.</span>`;
-        }
+        });
     }
+
+    async function clearSearch() {
+        document.getElementById('search-input').value = '';
+        document.getElementById('search-section').classList.add('hidden');
+        document.getElementById('row-search').innerHTML = '';
+    }
+
+    async function fetchTMDB(path, params = {}) {
+        const url = new URL(`https://api.themoviedb.org/3/${path}`);
+        url.searchParams.set('api_key', TMDB_KEY);
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                url.searchParams.set(key, value);
+            }
+        });
+        const res = await fetch(url);
+        return res.ok ? await res.json() : { results: [] };
+    }
+
+    document.addEventListener('DOMContentLoaded', bindSearch);
 </script>
 <script>(function(s){s.dataset.zone='11078309',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <script>(function(s){s.dataset.zone='11078350',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>

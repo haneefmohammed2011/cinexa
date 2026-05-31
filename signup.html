@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CINEXA+ | Secure Access</title>
+        <link rel="icon" type="image/jpeg" href="Cinexa v2 Logo.jpeg">
+    <meta name="theme-color" content="#050505">
+<title>CINEXA+ | Secure Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
@@ -102,6 +104,12 @@
             return JSON.parse(localStorage.getItem(LOCAL_USER_KEY) || '[]');
         }
 
+        async function hashPassword(password) {
+            const data = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         function saveLocalUser(user) {
             const users = getLocalUsers();
             if (users.some(existing => existing.contact === user.contact)) {
@@ -113,13 +121,14 @@
             localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(users));
         }
 
-        function signInLocal(contact, password) {
+        async function signInLocal(contact, password) {
             const users = getLocalUsers();
             const user = users.find(item => item.contact === contact);
             if (!user) {
                 throw new Error('User not found. Please sign up first.');
             }
-            if (user.pass !== password) {
+            const hashed = await hashPassword(password);
+            if (user.passHash !== hashed) {
                 throw new Error('Incorrect password.');
             }
             return user;
@@ -134,11 +143,6 @@
         }
 
         await initAuth();
-
-        if (!amplifyLoaded) {
-            errBox.innerText = 'AWS Cognito is not configured or unavailable. Local account mode is enabled.';
-            errBox.classList.remove('hidden');
-        }
 
         window.goToStep = (id) => {
             document.querySelectorAll('.step-content').forEach(el => el.classList.add('step-hidden'));
@@ -179,10 +183,11 @@
                     document.getElementById('v-message').innerText = `Confirmation code sent to ${session.contact}`;
                     goToStep('v');
                 } else {
+                    const passHash = await hashPassword(session.pass);
                     saveLocalUser({
                         name: session.name,
                         contact: session.contact,
-                        pass: session.pass,
+                        passHash,
                         icon: `https://ui-avatars.com/api/?name=${encodeURIComponent(session.name)}&background=a855f7&color=fff`
                     });
                     const sessionData = createSession({
