@@ -2,20 +2,20 @@
 <html lang="en">
 <head>    
     <meta charset="UTF-8">    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-        <link rel="icon" type="image/jpeg" href="Cinexa v2 Logo.jpeg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+    <link rel="icon" type="image/jpeg" href="Cinexa v2 Logo.jpeg">
     <meta name="theme-color" content="#050505">
-<title>CINEXA+ | Watch</title>    
+    <title>CINEXA+ | Watch Platform</title>    
     <script src="https://cdn.tailwindcss.com"></script>    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>        
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');        
-        body { background-color: #050505; color: white; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }                
+        body { background-color: #050505; color: white; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }            
         .hero-mask { background: linear-gradient(to top, #050505 15%, transparent 100%), linear-gradient(to right, #050505 25%, rgba(5,5,5,0.4) 100%); }        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
         /* Cinematic Modal Overlay */        
-        #video-modal {            
+        #video-modal {                    
             display: none;            
             position: fixed;            
             inset: 0;            
@@ -35,20 +35,20 @@
             border: 1px solid rgba(255,255,255,0.1);            
             box-shadow: 0 0 100px rgba(168, 85, 247, 0.2);        
         }
-        #youtube-iframe { width: 100%; height: 100%; border: none; }
+        #stream-iframe { width: 100%; height: 100%; border: none; }
         .cast-card { transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; }        
         .cast-card:hover { transform: translateY(-10px); }        
         .cast-card:hover .img-node { border-color: #a855f7; box-shadow: 0 0 25px rgba(168, 85, 247, 0.4); }    
     </style>
 </head>
 <body class="min-h-screen pb-20">
-    <nav class="fixed top-0 w-full z-[100] px-6 md:px-16 py-8 flex justify-between items-center">        
+    <nav class="fixed top-0 w-full z-[100] px-6 md:px-16 py-8 flex justify-between items-center bg-gradient-to-b from-[#050505] to-transparent">        
         <h1 class="text-2xl font-800 italic tracking-tighter cursor-pointer" onclick="window.location.href='index.html'">            
             CINEXA<span class="text-purple-500">+</span>        
         </h1>        
         <div class="hidden md:flex gap-8 text-[10px] font-black uppercase tracking-[4px] opacity-40">            
-            <span>Terminal Node v.3.0</span>            
-            <span>Encryption: Active</span>        
+            <span>Terminal Node v.3.5</span>            
+            <span>Encryption: Private End-To-End</span>        
         </div>    
     </nav>
 
@@ -62,17 +62,20 @@
             
             <div class="lg:col-span-8">                
                 <div class="flex items-center gap-4 mb-6 flex-wrap">                    
-                    <span class="bg-purple-600 text-[10px] font-900 px-4 py-1.5 rounded-full uppercase italic tracking-widest">Cinema Stream</span>                    
+                    <span class="bg-purple-600 text-[10px] font-900 px-4 py-1.5 rounded-full uppercase italic tracking-widest">Cinema Engine Active</span>                    
                     <span id="vote-avg" class="text-green-400 font-bold font-mono text-sm tracking-widest"></span>                    
                     <span id="release-year" class="text-white/40 text-sm font-bold"></span>                
                 </div>                                
                 <h2 id="show-title" class="text-5xl md:text-9xl font-800 italic uppercase leading-[0.9] mb-8 md:mb-10 tracking-tighter break-words"></h2>                                
                 
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-12">                    
-                    <button onclick="playTrailer()" class="w-full sm:w-auto bg-white text-black px-12 py-5 rounded-2xl font-900 uppercase italic tracking-widest text-sm hover:bg-purple-500 hover:text-white transition-all transform hover:scale-105 active:scale-95 text-center">                        
-                        <i class="fas fa-play mr-3"></i> Watch Trailer                    
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-12 w-full">                    
+                    <button onclick="playMainFeature()" class="w-full sm:w-auto bg-purple-600 text-white px-12 py-5 rounded-2xl font-900 uppercase italic tracking-widest text-sm hover:bg-purple-500 transition-all transform hover:scale-105 active:scale-95 text-center shadow-lg shadow-purple-600/30">                    
+                        <i class="fas fa-ticket mr-3"></i> Initialize Stream                    
                     </button>                    
-                    <div id="runtime-box" class="text-white/40 text-xs font-black uppercase tracking-[3px]">                        
+                    <button onclick="playTrailer()" class="w-full sm:w-auto bg-white/5 border border-white/10 text-white px-8 py-5 rounded-2xl font-900 uppercase italic tracking-widest text-sm hover:bg-white/10 transition-all transform hover:scale-105 active:scale-95 text-center">                    
+                        <i class="fas fa-play mr-3"></i> View Trailer                    
+                    </button>                    
+                    <div id="runtime-box" class="text-white/40 text-xs font-black uppercase tracking-[3px] ml-0 sm:ml-4 pt-2 sm:pt-0">                        
                         Length: <span id="runtime" class="text-white">--</span>                    
                     </div>                
                 </div>
@@ -89,43 +92,56 @@
                 <h4 class="text-[10px] font-900 uppercase tracking-[4px] opacity-30 mb-8 text-center">System Specs</h4>                
                 <div class="space-y-6">                    
                     <div class="flex justify-between border-b border-white/5 pb-4">                        
-                        <span class="text-white/30 text-[10px] font-black uppercase tracking-widest">Quality</span>                        
-                        <span class="text-green-400 text-xs font-900 italic">ULTRA HD 4K</span>                    
+                        <span class="text-white/30 text-[10px] font-black uppercase tracking-widest">Quality Architecture</span>                        
+                        <span class="text-green-400 text-xs font-900 italic">AUTO adaptive HD</span>                    
                     </div>                    
                     <div class="flex justify-between border-b border-white/5 pb-4">                        
                         <span class="text-white/30 text-[10px] font-black uppercase tracking-widest">Genres</span>                        
                         <span id="genres" class="text-white text-xs font-bold text-right">--</span>                    
                     </div>                    
                     <div class="flex justify-between border-b border-white/5 pb-4">                        
-                        <span class="text-white/30 text-[10px] font-black uppercase tracking-widest">Language</span>                        
+                        <span class="text-white/30 text-[10px] font-black uppercase tracking-widest">Language Matrix</span>                        
                         <span class="text-white text-xs font-bold uppercase">English (Global)</span>                    
                     </div>                
                 </div>
 
-                <div class="mt-10 pt-8 border-t border-white/10">
-                    <h4 class="text-[10px] font-900 uppercase tracking-[4px] opacity-30 mb-5 text-center">Stream Now</h4>
-                    <div id="streaming-platforms" class="flex flex-wrap justify-center gap-3">
-                        <span class="text-xs text-white/40 italic">Checking platforms...</span>
+                <div id="tv-controls-panel" class="hidden mt-8 pt-6 border-t border-white/10 space-y-4">
+                    <h4 class="text-[10px] font-900 uppercase tracking-[4px] opacity-30 text-center">Episode Matrix Selector</h4>
+                    <div class="flex gap-3">
+                        <div class="w-1/2">
+                            <label class="block text-[9px] uppercase tracking-widest text-white/40 mb-1.5 ml-1">Season</label>
+                            <input type="number" id="season-input" value="1" min="1" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 font-bold transition-all">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-[9px] uppercase tracking-widest text-white/40 mb-1.5 ml-1">Episode</label>
+                            <input type="number" id="episode-input" value="1" min="1" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 font-bold transition-all">
+                        </div>
                     </div>
-
-                    <a href="https://www.google.com/maps/search/cinemas+near+me" target="_blank" rel="noopener noreferrer" class="mt-6 w-full flex items-center justify-center gap-3 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-white px-4 py-4 rounded-xl font-900 uppercase italic tracking-widest text-[10px] transition-all transform hover:scale-105">
-                        <i class="fas fa-location-dot text-purple-500 text-sm"></i> Find Nearest Cinema
-                    </a>
                 </div>
 
-                <div class="mt-10 pt-8 border-t border-white/10">
-                    <h4 class="text-[10px] font-900 uppercase tracking-[4px] opacity-30 mb-5 text-center">Sponsored</h4>
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div class="bg-white/5 border border-white/10 rounded-[32px] p-4 min-h-[180px] flex items-center justify-center">
-                            <div id="ad-slot-1" class="w-full h-full flex items-center justify-center">
-                                <script src="https://quge5.com/88/tag.min.js" data-zone="244492" async data-cfasync="false"></script>
-                            </div>
-                        </div>
-                        <div class="bg-white/5 border border-white/10 rounded-[32px] p-4 min-h-[180px] flex flex-col items-center justify-center text-center text-white/50 text-[11px] tracking-[1px]">
-                            <span class="font-900 uppercase mb-3">More offers</span>
-                            <p class="leading-relaxed">Promotions and content recommendations arranged neatly for the CINEXA terminal experience.</p>
-                        </div>
+                <div class="mt-8 pt-6 border-t border-white/10">
+                    <h4 class="text-[10px] font-900 uppercase tracking-[4px] opacity-30 mb-4 text-center">Decentralized Server Router</h4>
+                    <div class="grid grid-cols-2 gap-3" id="server-matrix-grid">
+                        <button onclick="switchServer('vidsrc_to')" id="btn-vidsrc_to" class="server-btn bg-purple-500/20 border border-purple-500 text-white p-3.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-center transition-all flex flex-col items-center justify-center gap-1">
+                            <span>ROUTE ALPHA</span>
+                            <span class="text-[8px] text-purple-400 font-normal">VidSrc.to (Main)</span>
+                        </button>
+                        <button onclick="switchServer('vidsrc_me')" id="btn-vidsrc_me" class="server-btn bg-white/5 border border-white/10 text-white/60 p-3.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-center transition-all flex flex-col items-center justify-center gap-1 hover:border-white/20">
+                            <span>ROUTE BETA</span>
+                            <span class="text-[8px] text-white/30 font-normal">VidSrc.me (Alt)</span>
+                        </button>
+                        <button onclick="switchServer('smashy')" id="btn-smashy" class="server-btn bg-white/5 border border-white/10 text-white/60 p-3.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-center transition-all flex flex-col items-center justify-center gap-1 hover:border-white/20 col-span-2">
+                            <span>ROUTE GAMMA</span>
+                            <span class="text-[8px] text-white/30 font-normal">SmashyStream (High Speed Mirror)</span>
+                        </button>
                     </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-white/10">
+                    <h4 class="text-[10px] font-900 uppercase tracking-[4px] opacity-30 mb-4 text-center">Local Manifestations</h4>
+                    <a href="https://www.google.com/maps/search/cinemas+near+me" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-4 rounded-xl font-900 uppercase italic tracking-widest text-[10px] transition-all transform hover:scale-102">
+                        <i class="fas fa-location-dot text-purple-500 text-sm"></i> Locate Nearest Theatre
+                    </a>
                 </div>
             </div>        
         </div>    
@@ -135,36 +151,46 @@
         <button onclick="closePlayer()" class="absolute top-6 md:top-10 right-6 md:right-10 text-white/40 hover:text-white transition-all z-[1100]">            
             <i class="fas fa-times text-3xl md:text-4xl"></i>        
         </button>        
-        <div class="player-box">            
-            <iframe id="youtube-iframe" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>        
+        <div class="player-box relative">            
+            <div class="absolute top-5 left-5 pointer-events-none select-none z-50 bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/10 text-[11px] font-900 italic tracking-wider text-white">
+                CINEXA<span class="text-purple-500">+</span> <span class="text-[8px] text-white/40 tracking-[2px] ml-2 font-mono font-normal">SECURE STREAM</span>
+            </div>
+            
+            <iframe id="stream-iframe" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>        
         </div>    
     </div>
 
     <script>        
         const TMDB_KEY = '4166e48ae0ebb3f6693923dfe397c0b9';        
         let trailerID = '';
+        let currentId = '';
+        let currentType = '';
+        let activeServer = 'vidsrc_to'; // Default server
 
         async function loadContent() {            
             const urlParams = new URLSearchParams(window.location.search);            
-            // Added a fallback ID (Inception) so you can test the code without parameters in the URL
-            const id = urlParams.get('id') || '27205';            
-            const type = urlParams.get('type') || 'movie';
+            currentId = urlParams.get('id') || '27205';            
+            currentType = urlParams.get('type') || 'movie';
+
+            // Show or hide TV Episode configurations dynamically 
+            if (currentType === 'tv') {
+                document.getElementById('tv-controls-panel').classList.remove('hidden');
+            }
 
             try {                
-                // Appended 'watch/providers' to the API request to get streaming platforms
-                const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=${TMDB_KEY}&append_to_response=videos,credits,watch/providers`);                
+                const res = await fetch(`https://api.themoviedb.org/3/${currentType}/${currentId}?api_key=${TMDB_KEY}&append_to_response=videos,credits`);                
                 const data = await res.json();
 
-                // Inject UI Data                
+                // Inject UI Content Data                
                 document.getElementById('detail-bg').src = `https://image.tmdb.org/t/p/original${data.backdrop_path}`;                
                 document.getElementById('show-title').innerText = data.title || data.name;                
                 document.getElementById('show-desc').innerText = data.overview;                
                 document.getElementById('vote-avg').innerText = `⭐ ${data.vote_average.toFixed(1)}`;                
                 document.getElementById('release-year').innerText = (data.release_date || data.first_air_date || '').split('-')[0];                
-                document.getElementById('runtime').innerText = `${data.runtime || '--'} MIN`;                
+                document.getElementById('runtime').innerText = `${data.runtime || data.episode_run_time?.[0] || '--'} MIN`;                
                 document.getElementById('genres').innerText = data.genres.map(g => g.name).slice(0, 2).join(' / ');
 
-                // Cast
+                // Populate Cast Row Matrix
                 document.getElementById('cast-row').innerHTML = data.credits.cast.slice(0, 10).map(c => `                    
                     <div class="min-w-[120px] md:min-w-[140px] cast-card group" onclick="window.location.href='actor.html?id=${c.id}'">                        
                         <div class="img-node w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mb-4 md:mb-5 border-2 border-white/10 transition-all">                            
@@ -175,28 +201,13 @@
                     </div>                
                 `).join('');
 
-                // Streaming Platforms Injection
-                // We default to 'US' region providers. You can change 'US' to any other country code if needed.
-                const watchProviders = data['watch/providers']?.results?.US;
-                const platformsContainer = document.getElementById('streaming-platforms');
-                
-                if (watchProviders && watchProviders.flatrate) {
-                    platformsContainer.innerHTML = watchProviders.flatrate.slice(0, 5).map(provider => `
-                        <a href="${watchProviders.link}" target="_blank" title="Watch on ${provider.provider_name}" class="group">
-                            <img src="https://image.tmdb.org/t/p/w200${provider.logo_path}" alt="${provider.provider_name}" class="w-10 h-10 md:w-12 md:h-12 rounded-xl border border-white/10 group-hover:border-purple-500 group-hover:scale-110 transition-all shadow-lg object-cover">
-                        </a>
-                    `).join('');
-                } else {
-                    platformsContainer.innerHTML = `<span class="text-xs text-white/40 italic">Not available on standard streaming.</span>`;
-                }
-
-                // Trailer logic
+                // Extract Native YouTube Trailer Link Lookups
                 const video = data.videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');                
                 if (video) trailerID = video.key;
 
                 recordViewedItem({
-                    tmdbId: id,
-                    type,
+                    tmdbId: currentId,
+                    type: currentType,
                     title: data.title || data.name,
                     poster_path: data.poster_path,
                     vote_average: data.vote_average || 0,
@@ -204,27 +215,68 @@
                 });
 
             } catch (err) { 
-                console.error("Cinema Node Error:", err); 
-                document.getElementById('streaming-platforms').innerHTML = `<span class="text-xs text-red-400 italic">Failed to load platform data.</span>`;
+                console.error("Cinema Node Runtime Interface Failure:", err); 
             }        
         }
 
-        function playTrailer() {            
-            // Trigger Monetag Popup logic here            
-            if (typeof show_8848123 === 'function') { show_8848123({ type: 'pop' }); }
-
-            const modal = document.getElementById('video-modal');            
-            const iframe = document.getElementById('youtube-iframe');                        
+        // Functional Decentralized Streaming Server Resolver
+        function getComputedStreamUrl() {
+            const season = document.getElementById('season-input').value || '1';
+            const episode = document.getElementById('episode-input').value || '1';
             
-            // Native YouTube Embed with Autoplay and High Contrast            
+            if (currentType === 'movie') {
+                if (activeServer === 'vidsrc_to') return `https://vidsrc.to/embed/movie/${currentId}`;
+                if (activeServer === 'vidsrc_me') return `https://vidsrc.me/embed/movie?tmdb=${currentId}`;
+                if (activeServer === 'smashy') return `https://embed.smashystream.com/playere.php?tmdb=${currentId}`;
+            } else {
+                if (activeServer === 'vidsrc_to') return `https://vidsrc.to/embed/tv/${currentId}/${season}/${episode}`;
+                if (activeServer === 'vidsrc_me') return `https://vidsrc.me/embed/tv?tmdb=${currentId}&season=${season}&episode=${episode}`;
+                if (activeServer === 'smashy') return `https://embed.smashystream.com/playere.php?tmdb=${currentId}&season=${season}&episode=${episode}`;
+            }
+            return `https://vidsrc.to/embed/movie/${currentId}`;
+        }
+
+        function switchServer(serverKey) {
+            activeServer = serverKey;
+            
+            // Clean active visual properties across target element controls
+            document.querySelectorAll('.server-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-500/20', 'border-purple-500');
+                btn.classList.add('bg-white/5', 'border-white/10', 'text-white/60');
+            });
+
+            // Set high-end glowing wrapper style to chosen node button
+            const activeBtn = document.getElementById(`btn-${serverKey}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white/5', 'border-white/10', 'text-white/60');
+                activeBtn.classList.add('bg-purple-500/20', 'border-purple-500');
+            }
+
+            // If player is already open, instantly switch streaming route smoothly without restart requirements
+            const modal = document.getElementById('video-modal');
+            if (modal.style.display === 'flex') {
+                document.getElementById('stream-iframe').src = getComputedStreamUrl();
+            }
+        }
+
+        function playMainFeature() {
+            const modal = document.getElementById('video-modal');            
+            const iframe = document.getElementById('stream-iframe');                        
+            iframe.src = getComputedStreamUrl();            
+            modal.style.display = 'flex';
+        }
+
+        function playTrailer() {            
+            const modal = document.getElementById('video-modal');            
+            const iframe = document.getElementById('stream-iframe');                        
             iframe.src = `https://www.youtube.com/embed/${trailerID}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0`;            
             modal.style.display = 'flex';        
         }
 
         function closePlayer() {            
             const modal = document.getElementById('video-modal');            
-            const iframe = document.getElementById('youtube-iframe');            
-            iframe.src = ""; // Force stop playback            
+            const iframe = document.getElementById('stream-iframe');            
+            iframe.src = ""; // Clear source allocation to completely kill background execution threads            
             modal.style.display = 'none';        
         }
 
@@ -245,6 +297,5 @@
 
         window.onload = loadContent;    
     </script>
-    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"64f123b25d7340a8adda0b5ab2bbf21e","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
